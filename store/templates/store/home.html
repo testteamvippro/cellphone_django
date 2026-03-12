@@ -1,0 +1,232 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="grid grid-cols-12 gap-6">
+        <!-- Sidebar -->
+        <aside class="col-span-3">
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h3 class="font-bold text-lg mb-4 text-gray-800">Danh mục sản phẩm</h3>
+                <ul class="space-y-2">
+                    {% for category in categories %}
+                    <li>
+                        <a href="{% url 'store:product_list' %}?category={{ category.slug }}" 
+                           class="flex items-center space-x-3 p-2 rounded hover:bg-red-50 text-gray-700">
+                            <i class="fas {{ category.icon }} text-red-600"></i>
+                            <span>{{ category.name }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Brands -->
+            <div class="bg-white rounded-lg shadow-md p-4 mt-4">
+                <h3 class="font-bold text-lg mb-4 text-gray-800">Thương hiệu</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    {% for brand in brands %}
+                    <a href="{% url 'store:product_list' %}?brand={{ brand.slug }}" 
+                       class="p-2 border rounded hover:border-red-600 text-center">
+                        <span class="text-sm">{{ brand.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="col-span-9">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-8 text-white mb-6">
+                <h1 class="text-4xl font-bold mb-2">Mua sắm thông minh</h1>
+                <p class="text-xl mb-4">Giảm giá đến 50% cho các sản phẩm công nghệ</p>
+                <a href="{% url 'store:product_list' %}" class="inline-block bg-white text-red-600 px-6 py-2 rounded-lg font-bold hover:bg-gray-100">
+                    Xem ngay
+                </a>
+            </div>
+
+            <!-- Flash Sale -->
+            {% if flash_sale_products %}
+            <section class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-bolt mr-2"></i>
+                        FLASH SALE
+                    </h2>
+                    <div class="text-white text-xl font-bold" id="flash-sale-timer">
+                        Kết thúc trong: <span class="bg-white text-red-600 px-3 py-1 rounded">12:34:56</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    {% for product in flash_sale_products %}
+                    <a href="{% url 'store:product_detail' product.slug %}" class="bg-white rounded-lg p-4 hover:shadow-xl transition">
+                        <div class="relative mb-3">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
+                            {% else %}
+                            <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-mobile-alt text-gray-400 text-4xl"></i>
+                            </div>
+                            {% endif %}
+                            <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
+                                -{{ product.discount_percentage }}%
+                            </span>
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
+                        <div class="flex items-center justify-between">
+                            <span class="text-red-600 font-bold">{{ product.flash_sale_price|floatformat:0 }}₫</span>
+                            <span class="text-gray-400 line-through text-sm">{{ product.price|floatformat:0 }}₫</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- New Products -->
+            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-star text-yellow-500 mr-2"></i>
+                    Sản phẩm mới
+                </h2>
+                <div class="grid grid-cols-4 gap-4">
+                    {% for product in new_products %}
+                    <a href="{% url 'store:product_detail' product.slug %}" class="border rounded-lg p-4 hover:shadow-lg transition">
+                        <div class="relative mb-3">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
+                            {% else %}
+                            <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-mobile-alt text-gray-400 text-4xl"></i>
+                            </div>
+                            {% endif %}
+                            {% if product.discount_percentage > 0 %}
+                            <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
+                                -{{ product.discount_percentage }}%
+                            </span>
+                            {% endif %}
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
+                        <div class="mb-2">
+                            <span class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <div class="flex text-yellow-400">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="text-gray-500 ml-2">({{ product.rating }})</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Product Categories -->
+            {% for category, products in products_by_category.items %}
+            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">{{ category.name }}</h2>
+                    <a href="{% url 'store:product_list' %}?category={{ category.slug }}" class="text-red-600 hover:text-red-700">
+                        Xem tất cả <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    {% for product in products %}
+                    <a href="{% url 'store:product_detail' product.slug %}" class="border rounded-lg p-4 hover:shadow-lg transition">
+                        <div class="relative mb-3">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
+                            {% else %}
+                            <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-{{ category.icon }} text-gray-400 text-4xl"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
+                        <div class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+
+            <!-- Video Reviews -->
+            {% if video_reviews %}
+            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-play-circle text-red-600 mr-2"></i>
+                    Video đánh giá
+                </h2>
+                <div class="grid grid-cols-3 gap-4">
+                    {% for video in video_reviews %}
+                    <div class="border rounded-lg overflow-hidden hover:shadow-lg transition">
+                        <div class="relative">
+                            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-48 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <i class="fas fa-play-circle text-white text-5xl"></i>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-semibold text-sm truncate">{{ video.title }}</h3>
+                            <p class="text-gray-500 text-xs mt-1">{{ video.views }} lượt xem</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- News -->
+            {% if news_articles %}
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Tin tức công nghệ</h2>
+                    <a href="{% url 'store:news_list' %}" class="text-red-600 hover:text-red-700">
+                        Xem tất cả <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    {% for article in news_articles %}
+                    <a href="{% url 'store:news_detail' article.slug %}" class="border rounded-lg overflow-hidden hover:shadow-lg transition">
+                        {% if article.thumbnail %}
+                        <img src="{{ article.thumbnail.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover">
+                        {% else %}
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-newspaper text-gray-400 text-4xl"></i>
+                        </div>
+                        {% endif %}
+                        <div class="p-3">
+                            <h3 class="font-semibold text-sm mb-2">{{ article.title }}</h3>
+                            <p class="text-gray-500 text-xs">{{ article.published_date|date:"d/m/Y" }}</p>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Flash sale countdown timer
+function updateTimer() {
+    const hours = Math.floor(Math.random() * 12) + 1;
+    const minutes = Math.floor(Math.random() * 60);
+    const seconds = Math.floor(Math.random() * 60);
+    const timer = document.getElementById('flash-sale-timer');
+    if (timer) {
+        timer.querySelector('span').textContent = 
+            `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+}
+setInterval(updateTimer, 1000);
+</script>
+{% endblock %}

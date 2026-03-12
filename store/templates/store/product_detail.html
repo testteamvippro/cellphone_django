@@ -1,0 +1,191 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - CellphoneS{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Product Images -->
+            <div class="col-span-5">
+                <div class="border rounded-lg p-4 mb-4">
+                    {% if product.image %}
+                    <img id="main-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-contain">
+                    {% else %}
+                    <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-mobile-alt text-gray-400 text-6xl"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Color Options -->
+                {% if colors %}
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Chọn màu:</h3>
+                    <div class="flex space-x-2">
+                        {% for color in colors %}
+                        <button class="color-option border-2 rounded-lg p-2 hover:border-red-600" data-image="{{ color.image.url }}">
+                            <span class="text-sm">{{ color.color_name }}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-span-7">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
+                
+                <!-- Rating -->
+                <div class="flex items-center mb-4">
+                    <div class="flex text-yellow-400 text-lg">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= product.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="ml-2 text-gray-600">({{ product.rating }} sao)</span>
+                </div>
+
+                <!-- Price -->
+                <div class="mb-6">
+                    {% if product.flash_sale_price %}
+                    <div class="flex items-center space-x-4">
+                        <span class="text-4xl font-bold text-red-600">{{ product.flash_sale_price|floatformat:0 }}₫</span>
+                        <span class="text-2xl text-gray-400 line-through">{{ product.price|floatformat:0 }}₫</span>
+                        <span class="bg-red-600 text-white px-3 py-1 rounded">-{{ product.discount_percentage }}%</span>
+                    </div>
+                    {% else %}
+                    <span class="text-4xl font-bold text-red-600">{{ product.price|floatformat:0 }}₫</span>
+                    {% endif %}
+                </div>
+
+                <!-- Promotions -->
+                {% if product.promotion %}
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <h3 class="font-semibold text-yellow-800 mb-2">
+                        <i class="fas fa-gift"></i> Khuyến mãi
+                    </h3>
+                    <p class="text-yellow-700">{{ product.promotion }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Stock Status -->
+                <div class="mb-6">
+                    {% if product.stock > 0 %}
+                    <span class="text-green-600 font-semibold">
+                        <i class="fas fa-check-circle"></i> Còn hàng ({{ product.stock }} sản phẩm)
+                    </span>
+                    {% else %}
+                    <span class="text-red-600 font-semibold">
+                        <i class="fas fa-times-circle"></i> Hết hàng
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Add to Cart -->
+                <div class="flex space-x-4 mb-6">
+                    <form method="post" action="{% url 'store:add_to_cart' product.id %}" class="flex-1">
+                        {% csrf_token %}
+                        <div class="flex space-x-2">
+                            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" 
+                                   class="border rounded px-4 py-3 w-20 text-center">
+                            <button type="submit" class="flex-1 bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition"
+                                    {% if product.stock == 0 %}disabled{% endif %}>
+                                <i class="fas fa-shopping-cart mr-2"></i>
+                                Thêm vào giỏ hàng
+                            </button>
+                        </div>
+                    </form>
+                    <button onclick="toggleWishlist({{ product.id }})" class="border border-red-600 text-red-600 px-6 py-3 rounded-lg hover:bg-red-50">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+
+                <!-- Specifications -->
+                {% if specs %}
+                <div class="border-t pt-6">
+                    <h3 class="font-bold text-xl mb-4">Thông số kỹ thuật</h3>
+                    <div class="space-y-2">
+                        {% for spec in specs %}
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600">{{ spec.spec_name }}</span>
+                            <span class="font-semibold">{{ spec.spec_value }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mt-8 border-t pt-6">
+            <h3 class="font-bold text-2xl mb-4">Mô tả sản phẩm</h3>
+            <div class="prose max-w-none text-gray-700">
+                {{ product.description|linebreaks }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <h3 class="font-bold text-2xl mb-4">Sản phẩm tương tự</h3>
+        <div class="grid grid-cols-4 gap-4">
+            {% for related in related_products %}
+            <a href="{% url 'store:product_detail' related.slug %}" class="border rounded-lg p-4 hover:shadow-lg transition">
+                <div class="mb-3">
+                    {% if related.image %}
+                    <img src="{{ related.image.url }}" alt="{{ related.name }}" class="w-full h-40 object-contain">
+                    {% else %}
+                    <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-mobile-alt text-gray-400 text-3xl"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <h4 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ related.name }}</h4>
+                <span class="text-red-600 font-bold">{{ related.price|floatformat:0 }}₫</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Color selection
+document.querySelectorAll('.color-option').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.color-option').forEach(b => b.classList.remove('border-red-600'));
+        this.classList.add('border-red-600');
+        const imageUrl = this.dataset.image;
+        if (imageUrl) {
+            document.getElementById('main-image').src = imageUrl;
+        }
+    });
+});
+
+// Wishlist toggle
+function toggleWishlist(productId) {
+    fetch(`{% url 'store:toggle_wishlist' 0 %}`.replace('0', productId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.in_wishlist ? 'Đã thêm vào yêu thích' : 'Đã xóa khỏi yêu thích');
+        }
+    });
+}
+</script>
+{% endblock %}

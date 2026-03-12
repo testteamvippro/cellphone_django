@@ -1,0 +1,154 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name|default:"Sản phẩm" }} - CellphoneS{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="mb-4">
+        <h1 class="text-3xl font-bold text-gray-800">{{ category.name|default:"Tất cả sản phẩm" }}</h1>
+        <p class="text-gray-600">{{ products.count }} sản phẩm</p>
+    </div>
+
+    <div class="grid grid-cols-12 gap-6">
+        <!-- Filters Sidebar -->
+        <aside class="col-span-3">
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h3 class="font-bold text-lg mb-4">Bộ lọc</h3>
+                
+                <!-- Price Range -->
+                <div class="mb-6">
+                    <h4 class="font-semibold mb-2">Khoảng giá</h4>
+                    <form method="get" class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="price" value="" class="mr-2" {% if not request.GET.price %}checked{% endif %}>
+                            <span>Tất cả</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="price" value="0-5000000" class="mr-2" {% if request.GET.price == "0-5000000" %}checked{% endif %}>
+                            <span>Dưới 5 triệu</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="price" value="5000000-10000000" class="mr-2" {% if request.GET.price == "5000000-10000000" %}checked{% endif %}>
+                            <span>5 - 10 triệu</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="price" value="10000000-20000000" class="mr-2" {% if request.GET.price == "10000000-20000000" %}checked{% endif %}>
+                            <span>10 - 20 triệu</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="price" value="20000000-999999999" class="mr-2" {% if request.GET.price == "20000000-999999999" %}checked{% endif %}>
+                            <span>Trên 20 triệu</span>
+                        </label>
+                        <button type="submit" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700">
+                            Áp dụng
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Brands Filter -->
+                <div class="mb-6">
+                    <h4 class="font-semibold mb-2">Thương hiệu</h4>
+                    {% for brand in brands %}
+                    <label class="flex items-center mb-2">
+                        <input type="checkbox" name="brand" value="{{ brand.slug }}" class="mr-2">
+                        <span>{{ brand.name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Sort Options -->
+                <div>
+                    <h4 class="font-semibold mb-2">Sắp xếp</h4>
+                    <form method="get">
+                        <select name="sort" class="w-full border rounded px-3 py-2" onchange="this.form.submit()">
+                            <option value="">Mặc định</option>
+                            <option value="price_asc" {% if request.GET.sort == "price_asc" %}selected{% endif %}>Giá thấp đến cao</option>
+                            <option value="price_desc" {% if request.GET.sort == "price_desc" %}selected{% endif %}>Giá cao đến thấp</option>
+                            <option value="newest" {% if request.GET.sort == "newest" %}selected{% endif %}>Mới nhất</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Products Grid -->
+        <div class="col-span-9">
+            <div class="grid grid-cols-3 gap-4">
+                {% for product in products %}
+                <a href="{% url 'store:product_detail' product.slug %}" class="bg-white border rounded-lg p-4 hover:shadow-xl transition">
+                    <div class="relative mb-3">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-contain">
+                        {% else %}
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <i class="fas fa-mobile-alt text-gray-400 text-4xl"></i>
+                        </div>
+                        {% endif %}
+                        {% if product.discount_percentage > 0 %}
+                        <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
+                            -{{ product.discount_percentage }}%
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-sm font-semibold text-gray-800 mb-2 h-10 overflow-hidden">{{ product.name }}</h3>
+                    <div class="mb-2">
+                        {% if product.flash_sale_price %}
+                        <div class="flex items-center space-x-2">
+                            <span class="text-red-600 font-bold text-lg">{{ product.flash_sale_price|floatformat:0 }}₫</span>
+                            <span class="text-gray-400 line-through text-sm">{{ product.price|floatformat:0 }}₫</span>
+                        </div>
+                        {% else %}
+                        <span class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex text-yellow-400">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= product.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="text-gray-500">({{ product.rating }})</span>
+                    </div>
+                    {% if product.promotion %}
+                    <div class="mt-2 text-xs text-green-600">
+                        <i class="fas fa-gift"></i> {{ product.promotion }}
+                    </div>
+                    {% endif %}
+                </a>
+                {% empty %}
+                <div class="col-span-3 text-center py-12">
+                    <i class="fas fa-box-open text-gray-300 text-6xl mb-4"></i>
+                    <p class="text-gray-500 text-lg">Không tìm thấy sản phẩm nào</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if products.has_other_pages %}
+            <div class="mt-8 flex justify-center">
+                <nav class="flex space-x-2">
+                    {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}" class="px-4 py-2 border rounded hover:bg-gray-100">Trước</a>
+                    {% endif %}
+                    
+                    {% for num in products.paginator.page_range %}
+                    <a href="?page={{ num }}" class="px-4 py-2 border rounded {% if products.number == num %}bg-red-600 text-white{% else %}hover:bg-gray-100{% endif %}">
+                        {{ num }}
+                    </a>
+                    {% endfor %}
+                    
+                    {% if products.has_next %}
+                    <a href="?page={{ products.next_page_number }}" class="px-4 py-2 border rounded hover:bg-gray-100">Sau</a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
