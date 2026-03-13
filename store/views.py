@@ -42,7 +42,7 @@ def home(request):
     brands = Brand.objects.all()
     
     # News articles
-    news_articles = NewsArticle.objects.all().order_by('-published_date')[:3]
+    news_articles = NewsArticle.objects.all().order_by('-created_at')[:3]
     
     # Video reviews
     video_reviews = VideoReview.objects.all()[:3]
