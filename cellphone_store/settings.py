@@ -29,17 +29,20 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS configuration
 ALLOWED_HOSTS_STR = os.environ.get('ALLOWED_HOSTS', '')
+
 if ALLOWED_HOSTS_STR:
+    # Use the provided ALLOWED_HOSTS from environment
     ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 else:
     # Default for development
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-    # Add .onrender.com for Render deployments
-    if os.environ.get('RENDER'):
-        ALLOWED_HOSTS.extend(['.onrender.com', '*.onrender.com'])
-    # Allow custom domain if provided
-    if os.environ.get('CUSTOM_DOMAIN'):
-        ALLOWED_HOSTS.append(os.environ.get('CUSTOM_DOMAIN'))
+
+# Always allow Render domains
+ALLOWED_HOSTS.extend(['.onrender.com', '*.onrender.com'])
+
+# Allow custom domain if provided
+if os.environ.get('CUSTOM_DOMAIN'):
+    ALLOWED_HOSTS.append(os.environ.get('CUSTOM_DOMAIN'))
 
 
 # Application definition
