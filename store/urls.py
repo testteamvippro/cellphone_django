@@ -1,11 +1,15 @@
 from django.urls import path
 from . import views
+from . import admin_views
 
 app_name = 'store'
 
 urlpatterns = [
     # Home
     path('', views.home, name='home'),
+    
+    # Admin Dashboard (must be before other paths to avoid conflicts)
+    path('admin-dashboard/', admin_views.admin_dashboard, name='admin_dashboard'),
     
     # Products
     path('products/', views.product_list, name='product_list'),

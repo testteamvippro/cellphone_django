@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block branding %}
+<div style="padding: 10px 15px; background: #0c4b33; display: flex; align-items: center; gap: 15px;">
+    <img src="{% static 'store/images/logo.png' %}" alt="Dâu Store" style="height: 40px; width: auto;">
+    <h1 id="site-name" style="margin: 0; color: #f0e6d2; font-weight: bold;">
+        <a href="{% url 'admin:index' %}" style="color: #f0e6d2; text-decoration: none;">
+            Dâu Store Admin
+        </a>
+    </h1>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

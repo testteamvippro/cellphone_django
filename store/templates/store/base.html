@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CellphoneS - Điện Thoại, Laptop, Tablet, Phụ Kiện Chính Hãng{% endblock %}</title>
+    <title>{% block title %}Dâu Store - Điện Thoại, Laptop, Tablet, Phụ Kiện Chính Hãng{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
@@ -16,9 +16,8 @@
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-3">
                 <!-- Logo -->
-                <a href="{% url 'store:home' %}" class="flex items-center space-x-2">
-                    <i class="fas fa-mobile-alt text-3xl"></i>
-                    <span class="text-2xl font-bold">CellphoneS</span>
+                <a href="{% url 'store:home' %}" class="flex items-center">
+                    <img src="{% static 'store/images/logo.png' %}" alt="Dâu Store" class="h-12 w-auto">
                 </a>
 
                 <!-- Search Bar -->
@@ -108,7 +107,7 @@
                     <h3 class="text-lg font-bold mb-4">Liên hệ</h3>
                     <ul class="space-y-2 text-sm">
                         <li><i class="fas fa-phone"></i> 1800.2097</li>
-                        <li><i class="fas fa-envelope"></i> support@cellphones.vn</li>
+                        <li><i class="fas fa-envelope"></i> support@daustore.vn</li>
                         <li><i class="fas fa-map-marker-alt"></i> Hà Nội, Việt Nam</li>
                     </ul>
                 </div>
@@ -123,7 +122,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-8 pt-6 text-center text-sm">
-                <p>&copy; 2024 CellphoneS. All rights reserved.</p>
+                <p>&copy; 2026 Dâu Store. All rights reserved.</p>
             </div>
         </div>
     </footer>

@@ -1,0 +1,409 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dâu Store Dashboard - Admin{% endblock %}
+
+{% block extrahead %}
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #417690;
+    }
+    
+    .stat-card.warning {
+        border-left-color: #FF9800;
+    }
+    
+    .stat-card.danger {
+        border-left-color: #f44336;
+    }
+    
+    .stat-card.success {
+        border-left-color: #4CAF50;
+    }
+    
+    .stat-card.info {
+        border-left-color: #2196F3;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+        margin: 10px 0;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+    
+    .stat-icon {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+    
+    .section-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 30px 0 15px 0;
+        color: #333;
+        border-bottom: 2px solid #417690;
+        padding-bottom: 10px;
+    }
+    
+    .data-table {
+        width: 100%;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .data-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th {
+        background: #417690;
+        color: white;
+        padding: 12px;
+        text-align: left;
+        font-weight: bold;
+    }
+    
+    .data-table td {
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .data-table tr:hover {
+        background: #f9f9f9;
+    }
+    
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+    
+    .status-pending { background: #FF9800; }
+    .status-processing { background: #2196F3; }
+    .status-shipped { background: #9C27B0; }
+    .status-delivered { background: #4CAF50; }
+    .status-cancelled { background: #f44336; }
+    
+    .product-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .action-button {
+        display: block;
+        background: #417690;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .action-button:hover {
+        background: #2c5266;
+        color: white;
+    }
+    
+    .revenue-highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .revenue-highlight h2 {
+        margin: 0 0 20px 0;
+        font-size: 24px;
+    }
+    
+    .revenue-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+    
+    .revenue-stat {
+        text-align: center;
+    }
+    
+    .revenue-stat .value {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .revenue-stat .label {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1 style="margin-bottom: 30px;">📊 Store Dashboard</h1>
+    
+    <!-- Quick Actions -->
+    <h2 class="section-title">⚡ Quick Actions</h2>
+    <div class="quick-actions">
+        <a href="{% url 'admin:store_product_add' %}" class="action-button">➕ Add Product</a>
+        <a href="{% url 'admin:store_order_changelist' %}?status__exact=pending" class="action-button">📋 Pending Orders</a>
+        <a href="{% url 'admin:store_product_changelist' %}?stock__lt=10" class="action-button">⚠️ Low Stock</a>
+        <a href="{% url 'admin:store_newsarticle_add' %}" class="action-button">📝 Write Article</a>
+    </div>
+    
+    <!-- Revenue Highlight -->
+    <div class="revenue-highlight">
+        <h2>💰 Revenue Overview</h2>
+        <div class="revenue-stats">
+            <div class="revenue-stat">
+                <div class="value">₫{{ monthly_revenue|floatformat:0|default:"0" }}</div>
+                <div class="label">This Month</div>
+            </div>
+            <div class="revenue-stat">
+                <div class="value">₫{{ weekly_revenue|floatformat:0|default:"0" }}</div>
+                <div class="label">This Week</div>
+            </div>
+            <div class="revenue-stat">
+                <div class="value">₫{{ avg_order_value|floatformat:0|default:"0" }}</div>
+                <div class="label">Avg. Order</div>
+            </div>
+            <div class="revenue-stat">
+                <div class="value">₫{{ total_revenue|floatformat:0|default:"0" }}</div>
+                <div class="label">Total Revenue</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Grid -->
+    <h2 class="section-title">📈 Key Metrics</h2>
+    <div class="stats-grid">
+        <!-- Products -->
+        <div class="stat-card info">
+            <div class="stat-label">📦 Total Products</div>
+            <div class="stat-value">{{ total_products }}</div>
+            <small>{{ available_products }} available</small>
+        </div>
+        
+        <div class="stat-card warning">
+            <div class="stat-label">⚡ Flash Sales</div>
+            <div class="stat-value">{{ flash_sale_products }}</div>
+            <small>Active flash sale items</small>
+        </div>
+        
+        <div class="stat-card danger">
+            <div class="stat-label">⚠️ Low Stock</div>
+            <div class="stat-value">{{ low_stock }}</div>
+            <small>{{ out_of_stock }} out of stock</small>
+        </div>
+        
+        <!-- Orders -->
+        <div class="stat-card success">
+            <div class="stat-label">📋 Total Orders</div>
+            <div class="stat-value">{{ total_orders }}</div>
+            <small>{{ recent_orders_count }} this week</small>
+        </div>
+        
+        <div class="stat-card warning">
+            <div class="stat-label">⏳ Pending Orders</div>
+            <div class="stat-value">{{ pending_orders }}</div>
+            <small>Needs attention</small>
+        </div>
+        
+        <div class="stat-card info">
+            <div class="stat-label">🚚 In Transit</div>
+            <div class="stat-value">{{ shipped_orders }}</div>
+            <small>Shipped orders</small>
+        </div>
+        
+        <!-- Carts & Wishlist -->
+        <div class="stat-card">
+            <div class="stat-label">🛒 Active Carts</div>
+            <div class="stat-value">{{ active_carts }}</div>
+            <small>{{ abandoned_carts }} abandoned</small>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-label">❤️ Wishlist Items</div>
+            <div class="stat-value">{{ total_wishlist_items }}</div>
+            <small>Customer favorites</small>
+        </div>
+    </div>
+    
+    <!-- Recent Orders -->
+    <h2 class="section-title">📋 Recent Orders</h2>
+    <div class="data-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in latest_orders %}
+                <tr>
+                    <td><strong>{{ order.order_number }}</strong></td>
+                    <td>{{ order.full_name }}</td>
+                    <td>
+                        <span class="status-badge status-{{ order.status }}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td><strong>₫{{ order.total_amount|floatformat:0 }}</strong></td>
+                    <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <a href="{% url 'admin:store_order_change' order.id %}">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px;">No orders yet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Two Column Layout -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <!-- Popular Products -->
+        <div>
+            <h2 class="section-title">🔥 Popular Products</h2>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Views</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in popular_products %}
+                        <tr>
+                            <td>
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
+                                {% endif %}
+                            </td>
+                            <td>{{ product.name|truncatewords:5 }}</td>
+                            <td>{{ product.views_count|default:0 }}</td>
+                            <td>₫{{ product.price|floatformat:0 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 20px;">No products yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Low Stock Products -->
+        <div>
+            <h2 class="section-title">⚠️ Low Stock Alert</h2>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in low_stock_products %}
+                        <tr>
+                            <td>{{ product.name|truncatewords:5 }}</td>
+                            <td>
+                                <span style="color: {% if product.stock == 0 %}red{% else %}orange{% endif %}; font-weight: bold;">
+                                    {{ product.stock }} units
+                                </span>
+                            </td>
+                            <td>₫{{ product.price|floatformat:0 }}</td>
+                            <td>
+                                <a href="{% url 'admin:store_product_change' product.id %}">Edit</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 20px;">All products in stock!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Status Distribution -->
+    <h2 class="section-title">📊 Order Status Overview</h2>
+    <div class="stats-grid">
+        <div class="stat-card warning">
+            <div class="stat-label">⏳ Pending</div>
+            <div class="stat-value">{{ pending_orders }}</div>
+        </div>
+        <div class="stat-card info">
+            <div class="stat-label">🔄 Processing</div>
+            <div class="stat-value">{{ processing_orders }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">📦 Shipped</div>
+            <div class="stat-value">{{ shipped_orders }}</div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-label">✅ Delivered</div>
+            <div class="stat-value">{{ delivered_orders }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
