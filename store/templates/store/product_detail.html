@@ -1,46 +1,92 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}{{ product.name }} - CellphoneS{% endblock %}
+{% block title %}{{ product.name }} - Dâu Store{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="grid grid-cols-12 gap-8">
-            <!-- Product Images -->
-            <div class="col-span-5">
-                <div class="border rounded-lg p-4 mb-4">
+<div class="container mx-auto px-4 py-8">
+    <!-- Breadcrumb -->
+    <div class="text-gray-600 text-sm mb-6">
+        <a href="{% url 'store:home' %}" class="hover:text-red-600">Trang chủ</a> /
+        <a href="{% url 'store:product_list' %}" class="hover:text-red-600">Sản phẩm</a> /
+        <span class="text-gray-800">{{ product.name }}</span>
+    </div>
+
+    <!-- Flash Sale Badge -->
+    {% if product.is_flash_sale %}
+    <div class="mb-6 bg-red-50 border-l-4 border-red-600 px-4 py-3 rounded">
+        <p class="text-red-600 font-bold">
+            <i class="fas fa-bolt"></i> KHUYẾN MÃI GIỚI HẠN - Giảm {{ product.discount_percentage }}%
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left: Product Images -->
+        <div class="lg:col-span-1 order-2 lg:order-1">
+            <!-- Main Image -->
+            <div class="bg-white rounded-lg p-6 shadow-md mb-4">
+                <div class="bg-gray-100 rounded-lg p-4 mb-4 flex items-center justify-center" style="height: 400px;">
                     {% if product.image %}
-                    <img id="main-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-96 object-contain">
+                    <img id="main-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain">
                     {% else %}
-                    <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
-                        <i class="fas fa-mobile-alt text-gray-400 text-6xl"></i>
-                    </div>
+                    <i class="fas fa-mobile-alt text-gray-300 text-6xl"></i>
                     {% endif %}
                 </div>
-                
+
+                <!-- Additional Images -->
+                <div class="flex gap-2 mb-4">
+                    {% if product.image %}
+                    <button onclick="changeImage(this.src)" class="border-2 border-red-600 rounded p-2">
+                        <img src="{{ product.image.url }}" class="h-16 w-16 object-contain">
+                    </button>
+                    {% endif %}
+                    {% if product.image_2 %}
+                    <button onclick="changeImage(this.src)" class="border-2 border-gray-300 rounded p-2 hover:border-red-600">
+                        <img src="{{ product.image_2.url }}" class="h-16 w-16 object-contain">
+                    </button>
+                    {% endif %}
+                    {% if product.image_3 %}
+                    <button onclick="changeImage(this.src)" class="border-2 border-gray-300 rounded p-2 hover:border-red-600">
+                        <img src="{{ product.image_3.url }}" class="h-16 w-16 object-contain">
+                    </button>
+                    {% endif %}
+                </div>
+
                 <!-- Color Options -->
                 {% if colors %}
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">Chọn màu:</h3>
-                    <div class="flex space-x-2">
+                <div class="border-t pt-4">
+                    <h4 class="font-semibold text-sm mb-2">Chọn màu sắc:</h4>
+                    <div class="flex gap-2 flex-wrap">
                         {% for color in colors %}
-                        <button class="color-option border-2 rounded-lg p-2 hover:border-red-600" data-image="{{ color.image.url }}">
-                            <span class="text-sm">{{ color.color_name }}</span>
+                        <button class="color-option border-2 border-gray-300 rounded-lg px-3 py-2 text-xs hover:border-red-600 transition" 
+                                data-image="{{ color.image.url }}">
+                            {{ color.color_name }}
                         </button>
                         {% endfor %}
                     </div>
                 </div>
                 {% endif %}
             </div>
+        </div>
 
-            <!-- Product Info -->
-            <div class="col-span-7">
-                <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ product.name }}</h1>
+        <!-- Center: Product Info -->
+        <div class="lg:col-span-2 order-1 lg:order-2">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <!-- Title -->
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ product.name }}</h1>
                 
+                <!-- Brand -->
+                {% if product.brand %}
+                <p class="text-gray-600 mb-4">
+                    <span class="font-semibold">Thương hiệu:</span> 
+                    <a href="?" class="text-red-600 hover:underline">{{ product.brand.name }}</a>
+                </p>
+                {% endif %}
+
                 <!-- Rating -->
-                <div class="flex items-center mb-4">
-                    <div class="flex text-yellow-400 text-lg">
+                <div class="flex items-center gap-3 mb-6 pb-6 border-b">
+                    <div class="flex text-yellow-400">
                         {% for i in "12345" %}
                             {% if forloop.counter <= product.rating %}
                                 <i class="fas fa-star"></i>
@@ -49,114 +95,314 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <span class="ml-2 text-gray-600">({{ product.rating }} sao)</span>
+                    <span class="text-sm text-gray-600">
+                        {{ product.rating }}/5 
+                        <span class="text-gray-500">({{ product.reviews_count }} đánh giá)</span>
+                    </span>
                 </div>
 
-                <!-- Price -->
-                <div class="mb-6">
-                    {% if product.flash_sale_price %}
-                    <div class="flex items-center space-x-4">
-                        <span class="text-4xl font-bold text-red-600">{{ product.flash_sale_price|floatformat:0 }}₫</span>
-                        <span class="text-2xl text-gray-400 line-through">{{ product.price|floatformat:0 }}₫</span>
-                        <span class="bg-red-600 text-white px-3 py-1 rounded">-{{ product.discount_percentage }}%</span>
-                    </div>
+                <!-- Price Section -->
+                <div class="mb-6 pb-6 border-b">
+                    {% if product.is_flash_sale %}
+                        <div class="flex items-center gap-4 mb-2">
+                            <span class="text-4xl font-bold text-red-600">{{ product.price|floatformat:0 }}₫</span>
+                            <span class="text-xl text-gray-400 line-through">{{ product.original_price|floatformat:0 }}₫</span>
+                            <span class="bg-red-600 text-white px-3 py-1 rounded font-bold">-{{ product.discount_percentage }}%</span>
+                        </div>
                     {% else %}
-                    <span class="text-4xl font-bold text-red-600">{{ product.price|floatformat:0 }}₫</span>
+                        <span class="text-4xl font-bold text-red-600">{{ product.price|floatformat:0 }}₫</span>
+                    {% endif %}
+                    
+                    <!-- Installment Info -->
+                    {% if product.installment_offer %}
+                    <p class="text-sm text-gray-600 mt-2">
+                        <i class="fas fa-credit-card text-blue-600"></i> 
+                        {{ product.installment_offer }}
+                    </p>
                     {% endif %}
                 </div>
 
-                <!-- Promotions -->
-                {% if product.promotion %}
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                    <h3 class="font-semibold text-yellow-800 mb-2">
-                        <i class="fas fa-gift"></i> Khuyến mãi
-                    </h3>
-                    <p class="text-yellow-700">{{ product.promotion }}</p>
-                </div>
-                {% endif %}
-
-                <!-- Stock Status -->
-                <div class="mb-6">
-                    {% if product.stock > 0 %}
-                    <span class="text-green-600 font-semibold">
-                        <i class="fas fa-check-circle"></i> Còn hàng ({{ product.stock }} sản phẩm)
-                    </span>
+                <!-- Stock Status with Urgency -->
+                <div class="mb-6 pb-6 border-b">
+                    {% if product.stock > 20 %}
+                        <div class="flex items-center gap-2 text-green-600 font-semibold mb-2">
+                            <i class="fas fa-check-circle"></i>
+                            Còn {{ product.stock }} sản phẩm - Giao hàng nhanh
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
+                        </div>
+                    {% elif product.stock > 5 %}
+                        <div class="flex items-center gap-2 text-orange-600 font-semibold mb-2">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Chỉ còn {{ product.stock }} sản phẩm - Sắp hết
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-orange-600 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                    {% elif product.stock > 0 %}
+                        <div class="flex items-center gap-2 text-red-600 font-semibold mb-2">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Chỉ còn {{ product.stock }} sản phẩm - Sắp hết hàng
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-600 h-2 rounded-full" style="width: 20%"></div>
+                        </div>
                     {% else %}
-                    <span class="text-red-600 font-semibold">
-                        <i class="fas fa-times-circle"></i> Hết hàng
-                    </span>
+                        <div class="flex items-center gap-2 text-red-600 font-semibold">
+                            <i class="fas fa-times-circle"></i>
+                            Tạm hết hàng - Quay lại sau
+                        </div>
                     {% endif %}
                 </div>
 
-                <!-- Add to Cart -->
-                <div class="flex space-x-4 mb-6">
+                <!-- Add to Cart & Wishlist -->
+                <div class="flex gap-3 mb-6">
                     <form method="post" action="{% url 'store:add_to_cart' product.id %}" class="flex-1">
                         {% csrf_token %}
-                        <div class="flex space-x-2">
-                            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" 
-                                   class="border rounded px-4 py-3 w-20 text-center">
-                            <button type="submit" class="flex-1 bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition"
+                        <div class="flex gap-2">
+                            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock|default:1 }}" 
+                                   class="w-16 border border-gray-300 rounded px-3 py-3 text-center font-semibold hover:border-red-600"
+                                   {% if product.stock == 0 %}disabled{% endif %}>
+                            <button type="submit" class="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition flex items-center justify-center gap-2"
                                     {% if product.stock == 0 %}disabled{% endif %}>
-                                <i class="fas fa-shopping-cart mr-2"></i>
+                                <i class="fas fa-shopping-cart"></i>
                                 Thêm vào giỏ hàng
                             </button>
                         </div>
                     </form>
-                    <button onclick="toggleWishlist({{ product.id }})" class="border border-red-600 text-red-600 px-6 py-3 rounded-lg hover:bg-red-50">
+                    <button onclick="toggleWishlist({{ product.id }})" class="border-2 border-red-600 text-red-600 px-6 py-3 rounded-lg hover:bg-red-50 transition font-semibold">
                         <i class="far fa-heart"></i>
                     </button>
                 </div>
 
-                <!-- Specifications -->
-                {% if specs %}
-                <div class="border-t pt-6">
-                    <h3 class="font-bold text-xl mb-4">Thông số kỹ thuật</h3>
-                    <div class="space-y-2">
-                        {% for spec in specs %}
-                        <div class="flex justify-between py-2 border-b">
-                            <span class="text-gray-600">{{ spec.spec_name }}</span>
-                            <span class="font-semibold">{{ spec.spec_value }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
+                <!-- Promotions -->
+                {% if product.promotion_text %}
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-900 mb-2">
+                        <i class="fas fa-gift text-blue-600"></i> Khuyến mãi kèm theo
+                    </h4>
+                    <p class="text-blue-800 text-sm">{{ product.promotion_text }}</p>
                 </div>
                 {% endif %}
             </div>
+
+            <!-- Key Specifications -->
+            {% if product.storage or product.ram or product.screen_size %}
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="font-bold text-xl mb-4">Thông số chính</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    {% if product.storage %}
+                    <div class="border rounded p-4">
+                        <p class="text-gray-600 text-sm">Bộ nhớ</p>
+                        <p class="font-semibold text-lg">{{ product.storage }}</p>
+                    </div>
+                    {% endif %}
+                    {% if product.ram %}
+                    <div class="border rounded p-4">
+                        <p class="text-gray-600 text-sm">RAM</p>
+                        <p class="font-semibold text-lg">{{ product.ram }}</p>
+                    </div>
+                    {% endif %}
+                    {% if product.screen_size %}
+                    <div class="border rounded p-4">
+                        <p class="text-gray-600 text-sm">Màn hình</p>
+                        <p class="font-semibold text-lg">{{ product.screen_size }}</p>
+                    </div>
+                    {% endif %}
+                    {% if product.processor %}
+                    <div class="border rounded p-4">
+                        <p class="text-gray-600 text-sm">Chipset</p>
+                        <p class="font-semibold text-lg">{{ product.processor }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="mt-8 bg-white rounded-lg shadow-md">
+        <!-- Tab Headers -->
+        <div class="flex border-b">
+            <button class="tab-btn active px-6 py-4 font-semibold text-red-600 border-b-2 border-red-600 transition" data-tab="specs">
+                <i class="fas fa-list"></i> Thông số đầy đủ
+            </button>
+            <button class="tab-btn px-6 py-4 font-semibold text-gray-600 hover:text-red-600 transition" data-tab="description">
+                <i class="fas fa-file-alt"></i> Mô tả
+            </button>
+            {% if videos %}
+            <button class="tab-btn px-6 py-4 font-semibold text-gray-600 hover:text-red-600 transition" data-tab="videos">
+                <i class="fas fa-video"></i> Video
+            </button>
+            {% endif %}
         </div>
 
-        <!-- Description -->
-        <div class="mt-8 border-t pt-6">
-            <h3 class="font-bold text-2xl mb-4">Mô tả sản phẩm</h3>
-            <div class="prose max-w-none text-gray-700">
-                {{ product.description|linebreaks }}
+        <!-- Tab Contents -->
+        <div class="p-6">
+            <!-- Specifications Tab -->
+            <div id="specs" class="tab-content">
+                <div class="grid grid-cols-2 gap-6">
+                    {% if specs %}
+                        {% for spec in specs %}
+                        <div class="flex justify-between py-3 border-b">
+                            <span class="text-gray-600 font-semibold">{{ spec.spec_name }}</span>
+                            <span class="text-gray-800">{{ spec.spec_value }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <!-- Key Specs Table -->
+                    {% if product.storage or product.ram or product.screen_size or product.processor or product.camera or product.battery %}
+                    <div class="col-span-2">
+                        <h4 class="font-bold text-lg mb-4 pt-4 border-t">Cấu hình chi tiết</h4>
+                        <table class="w-full">
+                            {% if product.storage %}<tr class="border-b"><td class="py-2 font-semibold text-gray-700">Dung lượng lưu trữ</td><td class="py-2 text-gray-600">{{ product.storage }}</td></tr>{% endif %}
+                            {% if product.ram %}<tr class="border-b"><td class="py-2 font-semibold text-gray-700">RAM</td><td class="py-2 text-gray-600">{{ product.ram }}</td></tr>{% endif %}
+                            {% if product.screen_size %}<tr class="border-b"><td class="py-2 font-semibold text-gray-700">Kích thước màn hình</td><td class="py-2 text-gray-600">{{ product.screen_size }}</td></tr>{% endif %}
+                            {% if product.processor %}<tr class="border-b"><td class="py-2 font-semibold text-gray-700">Chipset</td><td class="py-2 text-gray-600">{{ product.processor }}</td></tr>{% endif %}
+                            {% if product.camera %}<tr class="border-b"><td class="py-2 font-semibold text-gray-700">Camera chính</td><td class="py-2 text-gray-600">{{ product.camera }}</td></tr>{% endif %}
+                            {% if product.battery %}<tr><td class="py-2 font-semibold text-gray-700">Pin</td><td class="py-2 text-gray-600">{{ product.battery }}</td></tr>{% endif %}
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
+
+            <!-- Description Tab -->
+            <div id="description" class="tab-content hidden">
+                <div class="prose max-w-none">
+                    <p class="text-gray-700 leading-relaxed">{{ product.description|linebreaks }}</p>
+                </div>
+            </div>
+
+            <!-- Videos Tab -->
+            {% if videos %}
+            <div id="videos" class="tab-content hidden">
+                <div class="grid grid-cols-2 gap-6">
+                    {% for video in videos %}
+                    <div class="rounded-lg overflow-hidden">
+                        <iframe width="100%" height="300" src="https://www.youtube.com/embed/{{ video.url }}" 
+                                frameborder="0" allowfullscreen></iframe>
+                        <h4 class="font-semibold mt-2">{{ video.title }}</h4>
+                        <p class="text-sm text-gray-600">{{ video.views|default:0 }} lượt xem</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Related Products -->
     {% if related_products %}
     <div class="mt-8 bg-white rounded-lg shadow-md p-6">
-        <h3 class="font-bold text-2xl mb-4">Sản phẩm tương tự</h3>
-        <div class="grid grid-cols-4 gap-4">
+        <h3 class="font-bold text-2xl mb-6">
+            <i class="fas fa-star text-yellow-400"></i> Sản phẩm tương tự
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {% for related in related_products %}
-            <a href="{% url 'store:product_detail' related.slug %}" class="border rounded-lg p-4 hover:shadow-lg transition">
-                <div class="mb-3">
+            <a href="{% url 'store:product_detail' related.slug %}" class="group border rounded-lg p-4 hover:shadow-xl transition">
+                <div class="mb-3 bg-gray-100 rounded-lg p-4 flex items-center justify-center h-32 overflow-hidden">
                     {% if related.image %}
-                    <img src="{{ related.image.url }}" alt="{{ related.name }}" class="w-full h-40 object-contain">
+                    <img src="{{ related.image.url }}" alt="{{ related.name }}" class="h-full w-full object-contain group-hover:scale-110 transition">
                     {% else %}
-                    <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
-                        <i class="fas fa-mobile-alt text-gray-400 text-3xl"></i>
-                    </div>
+                    <i class="fas fa-mobile-alt text-gray-300 text-3xl"></i>
                     {% endif %}
                 </div>
-                <h4 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ related.name }}</h4>
-                <span class="text-red-600 font-bold">{{ related.price|floatformat:0 }}₫</span>
+                <h4 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-red-600 transition">{{ related.name }}</h4>
+                <p class="text-red-600 font-bold">{{ related.price|floatformat:0 }}₫</p>
+                {% if related.discount_percentage %}
+                <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">-{{ related.discount_percentage }}%</span>
+                {% endif %}
             </a>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 </div>
+
+<style>
+    .tab-content.hidden {
+        display: none;
+    }
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+// Image gallery
+function changeImage(src) {
+    document.getElementById('main-image').src = src;
+    document.querySelectorAll('.flex button').forEach(btn => {
+        btn.classList.remove('border-red-600');
+        btn.classList.add('border-gray-300');
+    });
+    event.target.closest('button').classList.remove('border-gray-300');
+    event.target.closest('button').classList.add('border-red-600');
+}
+
+// Color selection
+document.querySelectorAll('.color-option').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.color-option').forEach(b => {
+            b.classList.remove('border-red-600', 'bg-red-50');
+            b.classList.add('border-gray-300');
+        });
+        this.classList.remove('border-gray-300');
+        this.classList.add('border-red-600', 'bg-red-50');
+        const imageUrl = this.dataset.image;
+        if (imageUrl) {
+            document.getElementById('main-image').src = imageUrl;
+        }
+    });
+});
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById(tabName).classList.remove('hidden');
+        
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('border-b-2', 'border-red-600', 'text-red-600');
+            b.classList.add('text-gray-600');
+        });
+        this.classList.add('border-b-2', 'border-red-600', 'text-red-600');
+    });
+});
+
+// Wishlist toggle
+function toggleWishlist(productId) {
+    fetch(`{% url 'store:toggle_wishlist' 0 %}`.replace('0', productId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const btn = event.target.closest('button');
+            if (data.in_wishlist) {
+                btn.classList.add('bg-red-50');
+                btn.innerHTML = '<i class="fas fa-heart text-red-600"></i>';
+            } else {
+                btn.classList.remove('bg-red-50');
+                btn.innerHTML = '<i class="far fa-heart"></i>';
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
 
 <script>
 // Color selection
