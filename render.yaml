@@ -3,7 +3,7 @@ services:
     name: cellphone-django
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput && mkdir -p staticfiles/media && cp -r media/* staticfiles/media/ 2>/dev/null || true
     startCommand: gunicorn cellphone_store.wsgi
     envVars:
       - key: DEBUG

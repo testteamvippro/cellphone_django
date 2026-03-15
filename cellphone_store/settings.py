@@ -151,11 +151,24 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Only add to STATICFILES_DIRS if directory exists
 STATIC_DIR = BASE_DIR / 'static'
-STATICFILES_DIRS = [STATIC_DIR] if STATIC_DIR.exists() else []
+MEDIA_DIR = BASE_DIR / 'media'
+
+# Include both static and media directories for WhiteNoise
+STATICFILES_DIRS = []
+if STATIC_DIR.exists():
+    STATICFILES_DIRS.append(str(STATIC_DIR))
+# Note: Media files are served through Django URL routing in production via WhiteNoise
 
 # Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# In production, add media to staticfiles and change MEDIA_ROOT to read from there
+if not DEBUG:
+    MEDIA_ROOT = BASE_DIR / 'staticfiles' / 'media'
+    # Add media directory to be served as staticfiles
+    if MEDIA_DIR.exists():
+        STATICFILES_DIRS.append((str(MEDIA_DIR), 'media'))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -165,6 +178,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Static files storage (WhiteNoise for production)
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Allow WhiteNoise to serve media files in production
+    WHITENOISE_MIMETYPES = {
+        '.webp': 'image/webp',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+    }
 
 # CORS Settings (for API access)
 CORS_ALLOW_ALL_ORIGINS = True  # For development only
