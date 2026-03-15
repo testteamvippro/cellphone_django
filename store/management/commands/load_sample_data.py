@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from store.models import Category, Brand, Product
+from store.models import Category, Brand, Product, ProductColor, ProductSpec
 from decimal import Decimal
 
 
@@ -324,6 +324,41 @@ class Command(BaseCommand):
                 slug=product_data['slug'],
                 defaults=product_data
             )
+            
+            # Get the product
+            product = Product.objects.get(slug=product_data['slug'])
+            
+            # Add colors to the product
+            color_options = ['Black', 'Silver', 'Gold', 'Blue', 'Red', 'Green', 'Purple']
+            color_hex_map = {
+                'Black': '#000000', 'Silver': '#C0C0C0', 'Gold': '#FFD700',
+                'Blue': '#0000FF', 'Red': '#FF0000', 'Green': '#00AA00', 'Purple': '#9932CC'
+            }
+            for color_opt in color_options[:3]:  # Add 3 colors per product
+                ProductColor.objects.get_or_create(
+                    product=product,
+                    color_name=color_opt,
+                    defaults={'color_hex': color_hex_map.get(color_opt, '#000000')}
+                )
+            
+            # Add specs to the product
+            specs_data = [
+                ('Bộ nhớ', storage, 1),
+                ('RAM', ram, 2),
+                ('Màn hình', screen, 3),
+                ('Dung lượng pin', '5000mAh', 4),
+                ('Camera sau', '48MP f/1.8', 5),
+                ('Camera trước', '20MP f/2.2', 6),
+                ('Kết nối', '5G, WiFi 6, Bluetooth 5.3', 7),
+                ('Hệ điều hành', 'Android 14', 8),
+            ]
+            for spec_name, spec_value, order in specs_data:
+                ProductSpec.objects.get_or_create(
+                    product=product,
+                    spec_name=spec_name,
+                    defaults={'spec_value': spec_value, 'order': order}
+                )
+            
             phone_count += 1
         
         self.stdout.write(self.style.SUCCESS(f'Created {len(products_data)} initial products'))
