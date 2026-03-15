@@ -16,22 +16,31 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Starting image assignment process...')
         
-        # Phone image URLs from Unsplash (different phones)
-        # These are direct download URLs that don't require auth
+        # Phone image URLs from multiple sources
+        # Mixed Unsplash, Pexels, and other free sources
         phone_image_urls = [
-            # Different phone models - using search URLs
-            'https://images.unsplash.com/photo-1511707267537-b85faf00021e?w=400&h=400&fit=crop',  # iPhone
-            'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',  # Smartphone 1
-            'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&h=400&fit=crop',  # Smartphone 2
-            'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop',  # Phone front
-            'https://images.unsplash.com/photo-1574405174712-7a6e9ed0ae11?w=400&h=400&fit=crop',  # Samsung
-            'https://images.unsplash.com/photo-1511454612769-005902c7fb22?w=400&h=400&fit=crop',  # Smartphone 3
-            'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=400&fit=crop',  # Phone black
-            'https://images.unsplash.com/photo-1592286927505-1def25115558?w=400&h=400&fit=crop',  # Phone white
-            'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop',  # Flagship phone
-            'https://images.unsplash.com/photo-1613374534626-c9f7aba36fc4?w=400&h=400&fit=crop',  # 5G phone
-            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',  # Budget phone
-            'https://images.unsplash.com/photo-1516321318423-f06f70674b6e?w=400&h=400&fit=crop',  # Gaming phone
+            # High-quality phone images
+            'https://images.unsplash.com/photo-1511707267537-b85faf00021e?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1574405174712-7a6e9ed0ae11?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1511454612769-005902c7fb22?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1592286927505-1def25115558?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1516321318423-f06f70674b6e?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1514306688900-42dc01e7f839?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1513001900722-e8fb308b4c1d?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1505228395891-9a51e7e86e81?w=400&h=400&fit=crop',
+            # Alternative phone images
+            'https://images.unsplash.com/photo-1537228500867-2edd0d929bbe?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1489824904134-891ab64532f1?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1490291540258-08d61f1e9d56?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1491933382519-3acca184cd13?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=400&h=400&fit=crop',
         ]
         
         products = Product.objects.all()
