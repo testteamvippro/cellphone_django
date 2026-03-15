@@ -12,12 +12,12 @@
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
-    <header class="bg-red-600 text-white sticky top-0 z-50 shadow-md">
+    <header class="bg-white text-gray-800 sticky top-0 z-50 shadow-lg border-b-4 border-red-600">
         <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between py-3">
+            <div class="flex items-center justify-between py-4">
                 <!-- Logo -->
                 <a href="{% url 'store:home' %}" class="flex items-center">
-                    <img src="{% static 'store/images/logo.png' %}" alt="Dâu Store" class="h-12 w-auto">
+                    <img src="{% static 'store/images/logo.png' %}" alt="Dâu Store" class="h-24 w-auto">
                 </a>
 
                 <!-- Search Bar -->
@@ -34,29 +34,29 @@
 
                 <!-- User Actions -->
                 <div class="flex items-center space-x-6">
-                    <a href="{% url 'store:cart_view' %}" class="relative hover:text-red-200">
-                        <i class="fas fa-shopping-cart text-2xl"></i>
-                        <span id="cart-count" class="absolute -top-2 -right-2 bg-yellow-400 text-red-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    <a href="{% url 'store:cart_view' %}" class="relative hover:text-red-600 transition">
+                        <i class="fas fa-shopping-cart text-2xl text-gray-700"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                             {{ cart_items_count|default:0 }}
                         </span>
                     </a>
-                    <a href="{% url 'store:wishlist_view' %}" class="relative hover:text-red-200">
-                        <i class="fas fa-heart text-2xl"></i>
+                    <a href="{% url 'store:wishlist_view' %}" class="relative hover:text-red-600 transition">
+                        <i class="fas fa-heart text-2xl text-gray-700"></i>
                     </a>
                     {% if user.is_authenticated %}
                     <div class="relative group">
-                        <button class="flex items-center space-x-2 hover:text-red-200">
+                        <button class="flex items-center space-x-2 hover:text-red-600 transition text-gray-700">
                             <i class="fas fa-user-circle text-2xl"></i>
                             <span>{{ user.username }}</span>
                         </button>
-                        <div class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg hidden group-hover:block">
-                            <a href="{% url 'store:order_list' %}" class="block px-4 py-2 hover:bg-gray-100">Đơn hàng của tôi</a>
-                            <a href="/admin/" class="block px-4 py-2 hover:bg-gray-100">Quản trị</a>
-                            <a href="/logout/" class="block px-4 py-2 hover:bg-gray-100">Đăng xuất</a>
+                        <div class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg hidden group-hover:block border border-gray-200">
+                            <a href="{% url 'store:order_list' %}" class="block px-4 py-2 hover:bg-red-50 hover:text-red-600">Đơn hàng của tôi</a>
+                            <a href="/admin/" class="block px-4 py-2 hover:bg-red-50 hover:text-red-600">Quản trị</a>
+                            <a href="/logout/" class="block px-4 py-2 hover:bg-red-50 hover:text-red-600">Đăng xuất</a>
                         </div>
                     </div>
                     {% else %}
-                    <a href="/login/" class="hover:text-red-200">
+                    <a href="/login/" class="hover:text-red-600 transition text-gray-700">
                         <i class="fas fa-user-circle text-2xl"></i>
                     </a>
                     {% endif %}
@@ -64,15 +64,15 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="border-t border-red-500 py-2">
-                <ul class="flex space-x-8 text-sm">
-                    <li><a href="{% url 'store:product_list' %}?category=smartphone" class="hover:text-red-200">Điện thoại</a></li>
-                    <li><a href="{% url 'store:product_list' %}?category=laptop" class="hover:text-red-200">Laptop</a></li>
-                    <li><a href="{% url 'store:product_list' %}?category=tablet" class="hover:text-red-200">Tablet</a></li>
-                    <li><a href="{% url 'store:product_list' %}?category=watch" class="hover:text-red-200">Đồng hồ</a></li>
-                    <li><a href="{% url 'store:product_list' %}?category=audio" class="hover:text-red-200">Âm thanh</a></li>
-                    <li><a href="{% url 'store:product_list' %}?category=tv" class="hover:text-red-200">Tivi</a></li>
-                    <li><a href="{% url 'store:news_list' %}" class="hover:text-red-200">Tin tức</a></li>
+            <nav class="border-t border-gray-200 py-3">
+                <ul class="flex space-x-8 text-sm font-medium text-gray-700">
+                    <li><a href="{% url 'store:product_list' %}?category=smartphone" class="hover:text-red-600 transition">Điện thoại</a></li>
+                    <li><a href="{% url 'store:product_list' %}?category=laptop" class="hover:text-red-600 transition">Laptop</a></li>
+                    <li><a href="{% url 'store:product_list' %}?category=tablet" class="hover:text-red-600 transition">Tablet</a></li>
+                    <li><a href="{% url 'store:product_list' %}?category=watch" class="hover:text-red-600 transition">Đồng hồ</a></li>
+                    <li><a href="{% url 'store:product_list' %}?category=audio" class="hover:text-red-600 transition">Âm thanh</a></li>
+                    <li><a href="{% url 'store:product_list' %}?category=tv" class="hover:text-red-600 transition">Tivi</a></li>
+                    <li><a href="{% url 'store:news_list' %}" class="hover:text-red-600 transition">Tin tức</a></li>
                 </ul>
             </nav>
         </div>
