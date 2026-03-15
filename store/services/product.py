@@ -52,8 +52,11 @@ class ProductService:
         """
         if search_query:
             products = self.repo.search(search_query)
-        else:
+        elif category_slug:
             products = self.repo.get_by_category(category_slug)
+        else:
+            # If no category slug, get all available products
+            products = self.repo.get_available_products()
 
         if brand_slug:
             products = products.filter(brand__slug=brand_slug)

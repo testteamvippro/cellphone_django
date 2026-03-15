@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Import Services (Business Logic Layer)
 from store.services.cart import CartService
@@ -88,6 +89,7 @@ def product_list(request, category_slug=None):
     brand_slug = request.GET.get('brand')
     search_query = request.GET.get('q')
     sort_by = request.GET.get('sort', '-created_at')
+    page = request.GET.get('page', 1)
     
     # Get products using service
     products, category = product_service.get_products_by_category(
@@ -97,17 +99,36 @@ def product_list(request, category_slug=None):
         sort_by=sort_by
     )
     
+    # Paginate products
+    paginator = Paginator(products, 15)  # 15 items per page
+    try:
+        products_page = paginator.page(page)
+    except PageNotAnInteger:
+        products_page = paginator.page(1)
+    except EmptyPage:
+        products_page = paginator.page(paginator.num_pages)
+    
     # Get filter options
     categories = Category.objects.all()
     brands = Brand.objects.all()
     
+    # Price options for sidebar
+    price_options = [
+        {'value': '', 'label': 'Tất cả'},
+        {'value': '0-5', 'label': 'Dưới 5 triệu'},
+        {'value': '5-10', 'label': '5-10 triệu'},
+        {'value': '10-20', 'label': '10-20 triệu'},
+        {'value': '20+', 'label': 'Trên 20 triệu'},
+    ]
+    
     context = {
-        'products': products,
+        'products': products_page,
         'category': category,
         'categories': categories,
         'brands': brands,
         'cart': cart,
         'search_query': search_query or '',
+        'price_options': price_options,
     }
     return render(request, 'store/product_list.html', context)
 
