@@ -2,225 +2,404 @@
 {% load static %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-6">
-    <div class="grid grid-cols-12 gap-6">
-        <!-- Sidebar -->
-        <aside class="col-span-3">
-            <div class="bg-white rounded-lg shadow-md p-4">
-                <h3 class="font-bold text-lg mb-4 text-gray-800">Danh mục sản phẩm</h3>
-                <ul class="space-y-2">
-                    {% for category in categories %}
-                    <li>
-                        <a href="{% url 'store:product_list' %}?category={{ category.slug }}" 
-                           class="flex items-center space-x-3 p-2 rounded hover:bg-red-50 text-gray-700">
-                            <i class="fas {{ category.icon }} text-red-600"></i>
-                            <span>{{ category.name }}</span>
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
+<style>
+    /* Modern animations */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.6); }
+    }
+    
+    .animate-fadeInUp { animation: fadeInUp 0.6s ease-out; }
+    .animate-slideInLeft { animation: slideInLeft 0.6s ease-out; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-glow { animation: glow 2s ease-in-out infinite; }
+    
+    /* Card hover effects */
+    .card-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Glassmorphism effect */
+    .glass {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Modern gradient text */
+    .gradient-text {
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
 
-            <!-- Brands -->
-            <div class="bg-white rounded-lg shadow-md p-4 mt-4">
-                <h3 class="font-bold text-lg mb-4 text-gray-800">Thương hiệu</h3>
-                <div class="grid grid-cols-2 gap-2">
-                    {% for brand in brands %}
-                    <a href="{% url 'store:product_list' %}?brand={{ brand.slug }}" 
-                       class="p-2 border rounded hover:border-red-600 text-center">
-                        <span class="text-sm">{{ brand.name }}</span>
+<!-- Modern Hero Section -->
+<div class="relative overflow-hidden bg-gradient-to-r from-red-600 via-red-700 to-red-900 pt-16 pb-24">
+    <!-- Animated background elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
+        <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-red-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
+    </div>
+    
+    <div class="relative container mx-auto px-4 z-10">
+        <div class="flex items-center justify-between">
+            <!-- Hero Text -->
+            <div class="w-1/2 animate-slideInLeft">
+                <h1 class="text-5xl font-bold text-white mb-4 leading-tight">
+                    Khám phá công nghệ hiện đại
+                </h1>
+                <p class="text-xl text-red-100 mb-2">
+                    Điện thoại, đồng hồ, máy tính bảng & laptop
+                </p>
+                <p class="text-red-100 mb-8">
+                    Giảm giá lên đến 50% cho những sản phẩm công nghệ hàng đầu
+                </p>
+                <div class="flex gap-4">
+                    <a href="{% url 'store:product_list' %}" class="bg-white text-red-600 px-8 py-3 rounded-lg font-bold shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 flex items-center gap-2">
+                        <i class="fas fa-shopping-bag"></i>
+                        Khám phá ngay
                     </a>
-                    {% endfor %}
+                    <button class="border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-red-600 transition duration-300">
+                        Tìm hiểu thêm
+                    </button>
                 </div>
             </div>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="col-span-9">
-            <!-- Hero Banner -->
-            <div class="bg-gradient-to-r from-red-600 to-pink-600 rounded-lg p-8 text-white mb-6">
-                <h1 class="text-4xl font-bold mb-2">Mua sắm thông minh</h1>
-                <p class="text-xl mb-4">Giảm giá đến 50% cho các sản phẩm công nghệ</p>
-                <a href="{% url 'store:product_list' %}" class="inline-block bg-white text-red-600 px-6 py-2 rounded-lg font-bold hover:bg-gray-100">
-                    Xem ngay
-                </a>
-            </div>
-
-            <!-- Flash Sale -->
-            {% if flash_sale_products %}
-            <section class="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold text-white flex items-center">
-                        <i class="fas fa-bolt mr-2"></i>
-                        FLASH SALE
-                    </h2>
-                    <div class="text-white text-xl font-bold" id="flash-sale-timer">
-                        Kết thúc trong: <span class="bg-white text-red-600 px-3 py-1 rounded">12:34:56</span>
+            
+            <!-- Hero Image -->
+            <div class="w-1/2 animate-fadeInUp" style="animation-delay: 0.2s;">
+                <div class="relative h-80">
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-300 to-transparent rounded-2xl transform rotate-3"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i class="fas fa-mobile-alt text-white text-9xl opacity-30"></i>
                     </div>
                 </div>
-                <div class="grid grid-cols-4 gap-4">
-                    {% for product in flash_sale_products %}
-                    <a href="{% url 'store:product_detail' product.slug %}" class="bg-white rounded-lg p-4 hover:shadow-xl transition">
-                        <div class="relative mb-3">
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
-                            {% else %}
-                            <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
-                            {% endif %}
-                            <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
-                                -{{ product.discount_percentage }}%
-                            </span>
-                        </div>
-                        <h3 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
-                        <div class="flex items-center justify-between">
-                            <span class="text-red-600 font-bold">{{ product.flash_sale_price|floatformat:0 }}₫</span>
-                            <span class="text-gray-400 line-through text-sm">{{ product.price|floatformat:0 }}₫</span>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endif %}
-
-            <!-- New Products -->
-            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-star text-yellow-500 mr-2"></i>
-                    Sản phẩm mới
-                </h2>
-                <div class="grid grid-cols-4 gap-4">
-                    {% for product in new_products %}
-                    <a href="{% url 'store:product_detail' product.slug %}" class="border rounded-lg p-4 hover:shadow-lg transition">
-                        <div class="relative mb-3">
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
-                            {% else %}
-                            <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
-                            {% endif %}
-                            {% if product.discount_percentage > 0 %}
-                            <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
-                                -{{ product.discount_percentage }}%
-                            </span>
-                            {% endif %}
-                        </div>
-                        <h3 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
-                        <div class="mb-2">
-                            <span class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</span>
-                        </div>
-                        <div class="flex items-center text-sm">
-                            <div class="flex text-yellow-400">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= product.rating %}
-                                        <i class="fas fa-star"></i>
-                                    {% else %}
-                                        <i class="far fa-star"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <span class="text-gray-500 ml-2">({{ product.rating }})</span>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <!-- Product Categories -->
-            {% for category, products in products_by_category.items %}
-            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">{{ category.name }}</h2>
-                    <a href="{% url 'store:product_list' %}?category={{ category.slug }}" class="text-red-600 hover:text-red-700">
-                        Xem tất cả <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-                <div class="grid grid-cols-4 gap-4">
-                    {% for product in products %}
-                    <a href="{% url 'store:product_detail' product.slug %}" class="border rounded-lg p-4 hover:shadow-lg transition">
-                        <div class="relative mb-3">
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
-                            {% else %}
-                            <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
-                            {% endif %}
-                        </div>
-                        <h3 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
-                        <div class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</div>
-                    </a>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endfor %}
-
-            <!-- Video Reviews -->
-            {% if video_reviews %}
-            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-play-circle text-red-600 mr-2"></i>
-                    Video đánh giá
-                </h2>
-                <div class="grid grid-cols-3 gap-4">
-                    {% for video in video_reviews %}
-                    <div class="border rounded-lg overflow-hidden hover:shadow-lg transition">
-                        <div class="relative">
-                            <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="w-full h-48 object-cover">
-                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                                <i class="fas fa-play-circle text-white text-5xl"></i>
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            <h3 class="font-semibold text-sm truncate">{{ video.title }}</h3>
-                            <p class="text-gray-500 text-xs mt-1">{{ video.views }} lượt xem</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endif %}
-
-            <!-- News -->
-            {% if news_articles %}
-            <section class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Tin tức công nghệ</h2>
-                    <a href="{% url 'store:news_list' %}" class="text-red-600 hover:text-red-700">
-                        Xem tất cả <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-                <div class="grid grid-cols-3 gap-4">
-                    {% for article in news_articles %}
-                    <a href="{% url 'store:news_detail' article.slug %}" class="border rounded-lg overflow-hidden hover:shadow-lg transition">
-                        {% if article.thumbnail %}
-                        <img src="{{ article.thumbnail.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover">
-                        {% else %}
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                            <i class="fas fa-newspaper text-gray-400 text-4xl"></i>
-                        </div>
-                        {% endif %}
-                        <div class="p-3">
-                            <h3 class="font-semibold text-sm mb-2">{{ article.title }}</h3>
-                            <p class="text-gray-500 text-xs">{{ article.published_date|date:"d/m/Y" }}</p>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Quick Categories -->
+<div class="bg-gray-50 py-8 -mt-8 relative z-20">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-4 gap-4">
+            {% for category in categories|slice:":4" %}
+            <a href="{% url 'store:product_list' %}?category={{ category.slug }}" class="card-hover glass rounded-xl p-6 text-center group">
+                <div class="text-4xl mb-3 group-hover:scale-110 transition duration-300">{{ category.icon }}</div>
+                <h3 class="font-semibold text-gray-800 group-hover:text-red-600 transition">{{ category.name }}</h3>
+                <p class="text-xs text-gray-500 mt-1">Khám phá ngay</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 py-12">
+    <!-- Flash Sale Section -->
+    {% if flash_sale_products %}
+    <section class="mb-16 animate-fadeInUp" style="animation-delay: 0.3s;">
+        <div class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
+            <!-- Animated background -->
+            <div class="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full -mr-48 -mt-48"></div>
+            
+            <div class="relative z-10 flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold flex items-center gap-2">
+                        <i class="fas fa-bolt animate-bounce"></i>
+                        FLASH SALE
+                    </h2>
+                    <p class="text-orange-100 mt-1">Ưu đãi giới hạn - Còn lại:</p>
+                </div>
+                <div class="text-4xl font-bold bg-white bg-opacity-20 px-6 py-4 rounded-lg glass">
+                    <span id="timer">12:34:56</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% for product in flash_sale_products|slice:":4" %}
+                <a href="{% url 'store:product_detail' product.slug %}" class="card-hover bg-white rounded-xl overflow-hidden group">
+                    <div class="relative overflow-hidden h-40">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-300">
+                        {% else %}
+                        <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-full object-contain">
+                        {% endif %}
+                        <span class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            -{{ product.discount_percentage }}%
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-sm font-semibold text-gray-800 truncate group-hover:text-red-600">{{ product.name }}</h3>
+                        <div class="mt-2">
+                            <span class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</span>
+                            {% if product.original_price %}
+                            <span class="text-gray-400 line-through text-sm ml-2">{{ product.original_price|floatformat:0 }}₫</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- New Products Section -->
+    <section class="mb-16 animate-fadeInUp" style="animation-delay: 0.4s;">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-star text-yellow-500"></i>
+                    Sản phẩm mới
+                </h2>
+                <p class="text-gray-600 mt-1">Những chiếc điện thoại, laptop và đồng hồ mới nhất năm 2026</p>
+            </div>
+            <a href="{% url 'store:product_list' %}" class="text-red-600 hover:text-red-700 font-semibold flex items-center gap-2 group">
+                Xem tất cả <i class="fas fa-arrow-right group-hover:translate-x-2 transition"></i>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {% for product in new_products|slice:":4" %}
+            <a href="{% url 'store:product_detail' product.slug %}" class="card-hover bg-white rounded-2xl overflow-hidden shadow-md group">
+                <div class="relative overflow-hidden h-48 bg-gray-100">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-300 p-2">
+                    {% else %}
+                    <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-full object-contain p-2">
+                    {% endif %}
+                    {% if product.discount_percentage > 0 %}
+                    <span class="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        -{{ product.discount_percentage }}%
+                    </span>
+                    {% endif %}
+                    <span class="absolute top-3 left-3 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        Mới
+                    </span>
+                </div>
+                <div class="p-4">
+                    <h3 class="text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-red-600 transition">{{ product.name }}</h3>
+                    <p class="text-xs text-gray-500 mt-1">{{ product.brand.name }}</p>
+                    <div class="mt-3 flex items-center justify-between">
+                        <div>
+                            <span class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</span>
+                        </div>
+                        <button class="text-red-600 hover:text-red-700 text-lg group-hover:scale-125 transition">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section class="mb-16 animate-fadeInUp" style="animation-delay: 0.5s;">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-2">
+            <i class="fas fa-th-large text-red-600"></i>
+            Danh mục sản phẩm
+        </h2>
+        
+        {% for category, products in products_by_category.items %}
+        <div class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ category.icon }} {{ category.name }}</h3>
+                    <p class="text-gray-600 text-sm mt-1">{{ products|length }} sản phẩm</p>
+                </div>
+                <a href="{% url 'store:product_list' %}?category={{ category.slug }}" class="text-red-600 hover:text-red-700 font-semibold flex items-center gap-2 group">
+                    Xem tất cả <i class="fas fa-arrow-right group-hover:translate-x-2 transition"></i>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {% for product in products|slice:":4" %}
+                <a href="{% url 'store:product_detail' product.slug %}" class="card-hover bg-white rounded-2xl overflow-hidden shadow-md group">
+                    <div class="relative overflow-hidden h-48 bg-gray-100">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain group-hover:scale-110 transition duration-300 p-2">
+                        {% else %}
+                        <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-full object-contain p-2">
+                        {% endif %}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-sm font-semibold text-gray-800 line-clamp-2">{{ product.name }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">{{ product.brand.name }}</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-red-600 font-bold">{{ product.price|floatformat:0 }}₫</span>
+                            <div class="text-xs text-yellow-500 flex gap-1">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.rating %}
+                                    <i class="fas fa-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <!-- Testimonials & Trust Section -->
+    <section class="mb-16 bg-gradient-to-r from-gray-50 to-gray-100 rounded-3xl p-12 animate-fadeInUp" style="animation-delay: 0.6s;">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">Tại sao chọn Dâu Store?</h2>
+        
+        <div class="grid grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-red-600 transition">
+                    <i class="fas fa-truck text-3xl text-red-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Giao hàng nhanh</h3>
+                <p class="text-gray-600">Giao hàng 24h tại Hà Nội và TP.HCM</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-3xl text-green-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Bảo hành chính hãng</h3>
+                <p class="text-gray-600">Bảo hành 12 tháng cho tất cả sản phẩm</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-headset text-3xl text-blue-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Hỗ trợ 24/7</h3>
+                <p class="text-gray-600">Tư vấn miễn phí và hỗ trợ khách hàng</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    {% if news_articles %}
+    <section class="mb-16 animate-fadeInUp" style="animation-delay: 0.7s;">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-newspaper text-red-600"></i>
+                    Tin tức công nghệ
+                </h2>
+                <p class="text-gray-600 mt-1">Cập nhật những thông tin công nghệ mới nhất</p>
+            </div>
+            <a href="{% url 'store:news_list' %}" class="text-red-600 hover:text-red-700 font-semibold flex items-center gap-2 group">
+                Xem tất cả <i class="fas fa-arrow-right group-hover:translate-x-2 transition"></i>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-6">
+            {% for article in news_articles|slice:":3" %}
+            <a href="{% url 'store:news_detail' article.slug %}" class="card-hover bg-white rounded-2xl overflow-hidden shadow-md group">
+                <div class="relative overflow-hidden h-40 bg-gradient-to-br from-red-600 to-red-700">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i class="fas fa-newspaper text-white text-5xl opacity-30"></i>
+                    </div>
+                    <div class="absolute inset-0 group-hover:bg-black group-hover:opacity-20 transition"></div>
+                </div>
+                <div class="p-6">
+                    <span class="text-xs font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full">{{ article.category }}</span>
+                    <h3 class="text-lg font-bold text-gray-900 line-clamp-2 mt-3 group-hover:text-red-600 transition">{{ article.title }}</h3>
+                    <p class="text-sm text-gray-600 line-clamp-2 mt-2">{{ article.excerpt }}</p>
+                    <div class="mt-4 flex items-center justify-between">
+                        <span class="text-xs text-gray-500"><i class="fas fa-eye mr-1"></i>{{ article.views }} lượt xem</span>
+                        <i class="fas fa-arrow-right text-red-600 group-hover:translate-x-2 transition"></i>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Video Reviews -->
+    {% if video_reviews %}
+    <section class="mb-16 animate-fadeInUp" style="animation-delay: 0.8s;">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-2">
+            <i class="fas fa-play-circle text-red-600"></i>
+            Video đánh giá
+        </h2>
+        
+        <div class="grid grid-cols-3 gap-6">
+            {% for video in video_reviews|slice:":3" %}
+            <a href="{{ video.video_url }}" target="_blank" class="card-hover rounded-2xl overflow-hidden shadow-md group">
+                <div class="relative overflow-hidden h-48 bg-gray-900">
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-play-circle text-white text-6xl"></i>
+                    </div>
+                    <i class="fas fa-play-circle text-white text-6xl absolute inset-0 flex items-center justify-center"></i>
+                </div>
+                <div class="p-4 bg-white">
+                    <h3 class="font-bold text-gray-900 line-clamp-2">{{ video.title }}</h3>
+                    <p class="text-xs text-gray-500 mt-2"><i class="fas fa-eye mr-1"></i>{{ video.views }} lượt xem</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+
 <script>
 // Flash sale countdown timer
+function pad(n) {
+    return n < 10 ? '0' + n : n;
+}
+
 function updateTimer() {
-    const hours = Math.floor(Math.random() * 12) + 1;
-    const minutes = Math.floor(Math.random() * 60);
-    const seconds = Math.floor(Math.random() * 60);
-    const timer = document.getElementById('flash-sale-timer');
-    if (timer) {
-        timer.querySelector('span').textContent = 
-            `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    let seconds = 45600; // Random seconds
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    const timerEl = document.getElementById('timer');
+    if (timerEl) {
+        timerEl.textContent = `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
     }
 }
-setInterval(updateTimer, 1000);
+
+// Update timer every second
+updateTimer();
+setInterval(() => {
+    let timerEl = document.getElementById('timer');
+    if (timerEl) {
+        let [h, m, s] = timerEl.textContent.split(':').map(Number);
+        s--;
+        if (s < 0) {
+            s = 59;
+            m--;
+            if (m < 0) {
+                m = 59;
+                h--;
+                if (h < 0) {
+                    h = 23;
+                }
+            }
+        }
+        timerEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    }
+}, 1000);
 </script>
 {% endblock %}
