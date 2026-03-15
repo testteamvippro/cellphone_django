@@ -267,5 +267,65 @@ class Command(BaseCommand):
                 defaults=product_data
             )
         
-        self.stdout.write(self.style.SUCCESS(f'Created {len(products_data)} products'))
+        # Generate 100 phone products for display
+        self.stdout.write('Generating 100 phone products...')
+        phone_brands = [samsung, apple, xiaomi, google]
+        phone_models = {
+            'samsung': ['Galaxy S24', 'Galaxy S24+', 'Galaxy S24 Ultra', 'Galaxy A55', 'Galaxy A35', 'Galaxy Z Fold', 'Galaxy Z Flip'],
+            'apple': ['iPhone 15', 'iPhone 15 Plus', 'iPhone 15 Pro', 'iPhone 15 Pro Max'],
+            'xiaomi': ['14', '14 Ultra', '14 Civi', '13', '13 Ultra', 'Redmi Note 14', 'Redmi 14'],
+            'google': ['Pixel 8', 'Pixel 8 Pro', 'Pixel 8a', 'Pixel Fold'],
+        }
+        storages = ['128GB', '256GB', '512GB', '1TB']
+        colors = ['Black', 'White', 'Silver', 'Gold', 'Blue', 'Red', 'Green', 'Purple', 'Pink']
+        rams = ['8GB', '12GB', '16GB', '24GB']
+        screens = ['6.1 inch', '6.3 inch', '6.5 inch', '6.7 inch', '6.8 inch', '7.0 inch']
+        
+        phone_count = 0
+        for i in range(100):
+            brand = phone_brands[i % len(phone_brands)]
+            brand_slug = brand.slug.lower()
+            model = phone_models.get(brand_slug, ['Phone'])[i % len(phone_models.get(brand_slug, ['Phone']))]
+            storage = storages[i % len(storages)]
+            color = colors[i % len(colors)]
+            ram = rams[i % len(rams)]
+            screen = screens[i % len(screens)]
+            
+            # Calculate prices
+            base_price = Decimal('12990000') + (i % 30) * Decimal('1000000')
+            original_price = base_price + Decimal('3000000')
+            
+            slug = f'{brand_slug}-{model.lower().replace(" ", "-")}-{storage.lower()}-{i}'.replace('+', 'plus')
+            product_name = f'{brand.name} {model} {storage} {ram}'
+            
+            is_flash_sale = (i % 3) == 0
+            
+            product_data = {
+                'name': product_name,
+                'slug': slug,
+                'category': phone_category,
+                'brand': brand,
+                'description': f'{brand.name} {model} với camera 48MP, pin 5000mAh, chip flagship mạnh mẽ',
+                'price': base_price,
+                'original_price': original_price,
+                'storage': storage,
+                'color': color,
+                'ram': ram,
+                'screen_size': screen,
+                'rating': Decimal('4') + Decimal(str(i % 10)) / Decimal('10'),
+                'reviews_count': 50 + (i % 500),
+                'stock': 10 + (i % 90),
+                'is_flash_sale': is_flash_sale,
+                'promotion_text': 'Trả góp 0% qua thẻ' if i % 2 == 0 else 'Thu cũ đổi mới',
+                'installment_offer': 'Trả góp 0% lên đến 12 tháng',
+            }
+            
+            Product.objects.get_or_create(
+                slug=product_data['slug'],
+                defaults=product_data
+            )
+            phone_count += 1
+        
+        self.stdout.write(self.style.SUCCESS(f'Created {len(products_data)} initial products'))
+        self.stdout.write(self.style.SUCCESS(f'Generated {phone_count} phone products'))
         self.stdout.write(self.style.SUCCESS('Sample data loaded successfully!'))

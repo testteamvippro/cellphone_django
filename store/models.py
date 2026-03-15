@@ -51,7 +51,7 @@ class Product(models.Model):
     screen_size = models.CharField(max_length=50, blank=True)
     
     # Images
-    image = models.ImageField(upload_to='products/')
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     image_2 = models.ImageField(upload_to='products/', null=True, blank=True)
     image_3 = models.ImageField(upload_to='products/', null=True, blank=True)
     
