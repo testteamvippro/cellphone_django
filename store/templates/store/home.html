@@ -65,9 +65,7 @@
                             {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
                             {% else %}
-                            <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
-                                <i class="fas fa-mobile-alt text-gray-400 text-4xl"></i>
-                            </div>
+                            <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
                             {% endif %}
                             <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
                                 -{{ product.discount_percentage }}%
@@ -97,9 +95,7 @@
                             {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
                             {% else %}
-                            <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
-                                <i class="fas fa-mobile-alt text-gray-400 text-4xl"></i>
-                            </div>
+                            <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
                             {% endif %}
                             {% if product.discount_percentage > 0 %}
                             <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
@@ -144,9 +140,7 @@
                             {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
                             {% else %}
-                            <div class="w-full h-40 bg-gray-200 flex items-center justify-center">
-                                <i class="fas fa-{{ category.icon }} text-gray-400 text-4xl"></i>
-                            </div>
+                            <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="w-full h-40 object-contain">
                             {% endif %}
                         </div>
                         <h3 class="text-sm font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>

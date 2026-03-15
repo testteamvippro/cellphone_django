@@ -30,7 +30,7 @@
                     {% if product.image %}
                     <img id="main-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain">
                     {% else %}
-                    <i class="fas fa-mobile-alt text-gray-300 text-6xl"></i>
+                    <img id="main-image" src="https://via.placeholder.com/400x400?text={{ product.brand.name }}+{{ product.name|truncatewords:2 }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain">
                     {% endif %}
                 </div>
 
@@ -40,15 +40,27 @@
                     <button onclick="changeImage(this.src)" class="border-2 border-red-600 rounded p-2">
                         <img src="{{ product.image.url }}" class="h-16 w-16 object-contain">
                     </button>
+                    {% else %}
+                    <button onclick="changeImage(this.src)" class="border-2 border-red-600 rounded p-2">
+                        <img src="https://via.placeholder.com/64x64?text=Phone1" class="h-16 w-16 object-contain">
+                    </button>
                     {% endif %}
                     {% if product.image_2 %}
                     <button onclick="changeImage(this.src)" class="border-2 border-gray-300 rounded p-2 hover:border-red-600">
                         <img src="{{ product.image_2.url }}" class="h-16 w-16 object-contain">
                     </button>
+                    {% else %}
+                    <button onclick="changeImage(this.src)" class="border-2 border-gray-300 rounded p-2 hover:border-red-600">
+                        <img src="https://via.placeholder.com/64x64?text=Phone2" class="h-16 w-16 object-contain">
+                    </button>
                     {% endif %}
                     {% if product.image_3 %}
                     <button onclick="changeImage(this.src)" class="border-2 border-gray-300 rounded p-2 hover:border-red-600">
                         <img src="{{ product.image_3.url }}" class="h-16 w-16 object-contain">
+                    </button>
+                    {% else %}
+                    <button onclick="changeImage(this.src)" class="border-2 border-gray-300 rounded p-2 hover:border-red-600">
+                        <img src="https://via.placeholder.com/64x64?text=Phone3" class="h-16 w-16 object-contain">
                     </button>
                     {% endif %}
                 </div>

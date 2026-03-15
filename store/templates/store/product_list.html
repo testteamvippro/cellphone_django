@@ -200,7 +200,7 @@
                             {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-full w-full object-contain group-hover:scale-110 transition">
                             {% else %}
-                            <i class="fas fa-mobile-alt text-gray-300 text-4xl"></i>
+                            <img src="https://via.placeholder.com/200x160?text={{ product.brand.name }}" alt="{{ product.name }}" class="h-full w-full object-contain group-hover:scale-110 transition">
                             {% endif %}
 
                             <!-- Discount Badge -->
