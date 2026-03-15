@@ -1,153 +1,361 @@
 {% extends 'store/base.html' %}
 {% load static %}
 
-{% block title %}{{ category.name|default:"Sản phẩm" }} - CellphoneS{% endblock %}
+{% block title %}{{ category.name|default:"Sản phẩm" }} - Dâu Store{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-6">
-    <div class="mb-4">
-        <h1 class="text-3xl font-bold text-gray-800">{{ category.name|default:"Tất cả sản phẩm" }}</h1>
-        <p class="text-gray-600">{{ products.count }} sản phẩm</p>
+<div class="bg-gray-50 min-h-screen">
+    <!-- Breadcrumb -->
+    <div class="container mx-auto px-4 py-3 text-sm text-gray-600">
+        <a href="{% url 'store:home' %}" class="hover:text-red-600">Trang chủ</a> /
+        <span>{{ category.name|default:"Tất cả sản phẩm" }}</span>
     </div>
 
-    <div class="grid grid-cols-12 gap-6">
-        <!-- Filters Sidebar -->
-        <aside class="col-span-3">
-            <div class="bg-white rounded-lg shadow-md p-4">
-                <h3 class="font-bold text-lg mb-4">Bộ lọc</h3>
-                
-                <!-- Price Range -->
-                <div class="mb-6">
-                    <h4 class="font-semibold mb-2">Khoảng giá</h4>
-                    <form method="get" class="space-y-2">
-                        <label class="flex items-center">
-                            <input type="radio" name="price" value="" class="mr-2" {% if not request.GET.price %}checked{% endif %}>
-                            <span>Tất cả</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="price" value="0-5000000" class="mr-2" {% if request.GET.price == "0-5000000" %}checked{% endif %}>
-                            <span>Dưới 5 triệu</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="price" value="5000000-10000000" class="mr-2" {% if request.GET.price == "5000000-10000000" %}checked{% endif %}>
-                            <span>5 - 10 triệu</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="price" value="10000000-20000000" class="mr-2" {% if request.GET.price == "10000000-20000000" %}checked{% endif %}>
-                            <span>10 - 20 triệu</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="price" value="20000000-999999999" class="mr-2" {% if request.GET.price == "20000000-999999999" %}checked{% endif %}>
-                            <span>Trên 20 triệu</span>
-                        </label>
-                        <button type="submit" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700">
-                            Áp dụng
-                        </button>
-                    </form>
+    <!-- Featured Banner -->
+    <div class="bg-white border-b">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">{{ category.name|default:"Điện thoại" }}</h1>
+                    <p class="text-gray-600 text-lg">{{ products.paginator.count }} sản phẩm</p>
                 </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500 mb-2">Nhanh chóng • Uy tín • Chất lượng</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Brands Filter -->
-                <div class="mb-6">
-                    <h4 class="font-semibold mb-2">Thương hiệu</h4>
+    <!-- Brand Filter Section -->
+    <div class="bg-white border-b py-4">
+        <div class="container mx-auto px-4">
+            <h3 class="font-bold text-sm mb-3">Điện thoại</h3>
+            <div class="overflow-x-auto pb-2">
+                <div class="flex gap-3 min-w-max">
+                    <a href="{% url 'store:product_list' %}" class="flex-shrink-0 px-4 py-2 border rounded-lg hover:border-red-600 hover:text-red-600 transition {% if not category %}border-red-600 text-red-600 font-semibold{% endif %}">
+                        Tất cả
+                    </a>
                     {% for brand in brands %}
-                    <label class="flex items-center mb-2">
-                        <input type="checkbox" name="brand" value="{{ brand.slug }}" class="mr-2">
-                        <span>{{ brand.name }}</span>
-                    </label>
+                    <a href="?brand={{ brand.slug }}" class="flex-shrink-0 px-4 py-2 border rounded-lg hover:border-red-600 hover:text-red-600 transition {% if request.GET.brand == brand.slug %}border-red-600 text-red-600 font-semibold{% endif %}">
+                        {{ brand.name }}
+                    </a>
                     {% endfor %}
                 </div>
-
-                <!-- Sort Options -->
-                <div>
-                    <h4 class="font-semibold mb-2">Sắp xếp</h4>
-                    <form method="get">
-                        <select name="sort" class="w-full border rounded px-3 py-2" onchange="this.form.submit()">
-                            <option value="">Mặc định</option>
-                            <option value="price_asc" {% if request.GET.sort == "price_asc" %}selected{% endif %}>Giá thấp đến cao</option>
-                            <option value="price_desc" {% if request.GET.sort == "price_desc" %}selected{% endif %}>Giá cao đến thấp</option>
-                            <option value="newest" {% if request.GET.sort == "newest" %}selected{% endif %}>Mới nhất</option>
-                        </select>
-                    </form>
-                </div>
             </div>
-        </aside>
+        </div>
+    </div>
 
-        <!-- Products Grid -->
-        <div class="col-span-9">
-            <div class="grid grid-cols-3 gap-4">
-                {% for product in products %}
-                <a href="{% url 'store:product_detail' product.slug %}" class="bg-white border rounded-lg p-4 hover:shadow-xl transition">
-                    <div class="relative mb-3">
-                        {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-contain">
-                        {% else %}
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                            <i class="fas fa-mobile-alt text-gray-400 text-4xl"></i>
-                        </div>
-                        {% endif %}
-                        {% if product.discount_percentage > 0 %}
-                        <span class="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs rounded-bl">
-                            -{{ product.discount_percentage }}%
-                        </span>
-                        {% endif %}
-                    </div>
-                    <h3 class="text-sm font-semibold text-gray-800 mb-2 h-10 overflow-hidden">{{ product.name }}</h3>
-                    <div class="mb-2">
-                        {% if product.flash_sale_price %}
-                        <div class="flex items-center space-x-2">
-                            <span class="text-red-600 font-bold text-lg">{{ product.flash_sale_price|floatformat:0 }}₫</span>
-                            <span class="text-gray-400 line-through text-sm">{{ product.price|floatformat:0 }}₫</span>
-                        </div>
-                        {% else %}
-                        <span class="text-red-600 font-bold text-lg">{{ product.price|floatformat:0 }}₫</span>
-                        {% endif %}
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="flex text-yellow-400">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= product.rating %}
-                                    <i class="fas fa-star"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <span class="text-gray-500">({{ product.rating }})</span>
-                    </div>
-                    {% if product.promotion %}
-                    <div class="mt-2 text-xs text-green-600">
-                        <i class="fas fa-gift"></i> {{ product.promotion }}
-                    </div>
-                    {% endif %}
+    <!-- Category/Use Case Section -->
+    <div class="bg-white border-b py-6">
+        <div class="container mx-auto px-4">
+            <h3 class="font-bold text-sm mb-4">Chọn theo nhu cầu</h3>
+            <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">🎮</div>
+                    <p class="text-xs font-semibold">Gaming</p>
                 </a>
-                {% empty %}
-                <div class="col-span-3 text-center py-12">
-                    <i class="fas fa-box-open text-gray-300 text-6xl mb-4"></i>
-                    <p class="text-gray-500 text-lg">Không tìm thấy sản phẩm nào</p>
-                </div>
-                {% endfor %}
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">🔋</div>
+                    <p class="text-xs font-semibold">Pin Trâu</p>
+                </a>
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">5️⃣</div>
+                    <p class="text-xs font-semibold">5G</p>
+                </a>
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">📷</div>
+                    <p class="text-xs font-semibold">Chụp Đẹp</p>
+                </a>
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">💰</div>
+                    <p class="text-xs font-semibold">Rẻ Nhất</p>
+                </a>
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <p class="text-xs font-semibold">Mạnh Nhất</p>
+                </a>
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">👨‍💼</div>
+                    <p class="text-xs font-semibold">Văn Phòng</p>
+                </a>
+                <a href="?" class="text-center p-4 border rounded-lg hover:border-red-600 hover:shadow-md transition">
+                    <div class="text-3xl mb-2">🎓</div>
+                    <p class="text-xs font-semibold">Học Tập</p>
+                </a>
             </div>
+        </div>
+    </div>
 
-            <!-- Pagination -->
-            {% if products.has_other_pages %}
-            <div class="mt-8 flex justify-center">
-                <nav class="flex space-x-2">
+    <div class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <!-- Advanced Filters Sidebar -->
+            <aside class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-20">
+                    <h3 class="font-bold text-lg mb-6">
+                        <i class="fas fa-sliders-h mr-2"></i> Bộ lọc
+                    </h3>
+
+                    <!-- Price Range -->
+                    <div class="mb-6 pb-6 border-b">
+                        <h4 class="font-semibold mb-3 flex items-center">
+                            <i class="fas fa-money-bill text-green-600 mr-2"></i> Giá
+                        </h4>
+                        <form method="get" id="filter-form" class="space-y-2">
+                            {% for price_opt in price_options %}
+                            <label class="flex items-center cursor-pointer hover:text-red-600 transition">
+                                <input type="radio" name="price" value="{{ price_opt.value }}" class="mr-3 cursor-pointer"
+                                       {% if request.GET.price == price_opt.value %}checked{% endif %} onchange="document.getElementById('filter-form').submit()">
+                                <span>{{ price_opt.label }}</span>
+                            </label>
+                            {% endfor %}
+                        </form>
+                    </div>
+
+                    <!-- RAM Filter -->
+                    <div class="mb-6 pb-6 border-b">
+                        <h4 class="font-semibold mb-3">
+                            <i class="fas fa-memory text-blue-600 mr-2"></i> RAM
+                        </h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 4GB</label>
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 6GB</label>
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 8GB</label>
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 12GB+</label>
+                        </div>
+                    </div>
+
+                    <!-- Storage Filter -->
+                    <div class="mb-6 pb-6 border-b">
+                        <h4 class="font-semibold mb-3">
+                            <i class="fas fa-database text-purple-600 mr-2"></i> Bộ nhớ
+                        </h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 64GB</label>
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 128GB</label>
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 256GB+</label>
+                        </div>
+                    </div>
+
+                    <!-- Screen Size -->
+                    <div class="mb-6 pb-6 border-b">
+                        <h4 class="font-semibold mb-3">
+                            <i class="fas fa-mobile-alt text-indigo-600 mr-2"></i> Màn hình
+                        </h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 6.0-6.5"</label>
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 6.5-7.0"</label>
+                            <label class="flex items-center"><input type="checkbox" class="mr-2"> 7.0"+</label>
+                        </div>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div>
+                        <h4 class="font-semibold mb-3">
+                            <i class="fas fa-sort text-orange-600 mr-2"></i> Sắp xếp
+                        </h4>
+                        <form method="get">
+                            <select name="sort" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-red-600 focus:outline-none" 
+                                    onchange="this.form.submit()">
+                                <option value="">Mặc định</option>
+                                <option value="price_asc" {% if request.GET.sort == "price_asc" %}selected{% endif %}>Giá thấp - cao</option>
+                                <option value="price_desc" {% if request.GET.sort == "price_desc" %}selected{% endif %}>Giá cao - thấp</option>
+                                <option value="newest" {% if request.GET.sort == "newest" %}selected{% endif %}>Mới nhất</option>
+                                <option value="popular" {% if request.GET.sort == "popular" %}selected{% endif %}>Phổ biến</option>
+                                <option value="rating" {% if request.GET.sort == "rating" %}selected{% endif %}>Đánh giá cao</option>
+                            </select>
+                        </form>
+                    </div>
+
+                    <!-- Clear Filters -->
+                    <a href="{% url 'store:product_list' %}" class="mt-6 w-full inline-block text-center bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition font-semibold text-sm">
+                        <i class="fas fa-redo mr-2"></i> Xóa bộ lọc
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Products Grid -->
+            <div class="lg:col-span-4">
+                <!-- View Options & Sorting Bar -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <button class="p-2 border rounded hover:bg-red-50 border-red-600 text-red-600">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="p-2 border rounded hover:bg-gray-100">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Hiển thị <strong>{{ products.paginator.count }}</strong> sản phẩm
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                {% if products %}
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for product in products %}
+                    <a href="{% url 'store:product_detail' product.slug %}" class="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition group">
+                        <!-- Product Image -->
+                        <div class="relative bg-gray-100 p-4 h-40 flex items-center justify-center overflow-hidden">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-full w-full object-contain group-hover:scale-110 transition">
+                            {% else %}
+                            <i class="fas fa-mobile-alt text-gray-300 text-4xl"></i>
+                            {% endif %}
+
+                            <!-- Discount Badge -->
+                            {% if product.discount_percentage > 0 %}
+                            <span class="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">
+                                Giảm {{ product.discount_percentage }}%
+                            </span>
+                            {% endif %}
+
+                            <!-- Flash Sale Badge -->
+                            {% if product.is_flash_sale %}
+                            <span class="absolute top-2 left-2 bg-orange-600 text-white px-2 py-1 text-xs font-bold rounded-full">
+                                <i class="fas fa-bolt"></i> HOT
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="p-4">
+                            <!-- Product Name -->
+                            <h3 class="text-sm font-semibold text-gray-800 mb-2 h-10 overflow-hidden line-clamp-2 group-hover:text-red-600">
+                                {{ product.name }}
+                            </h3>
+
+                            <!-- Specs Preview -->
+                            <div class="text-xs text-gray-500 mb-3 space-y-1">
+                                {% if product.screen_size %}<p>{{ product.screen_size }}</p>{% endif %}
+                                {% if product.storage %}<p>{{ product.storage }}</p>{% endif %}
+                                {% if product.processor %}<p>{{ product.processor }}</p>{% endif %}
+                            </div>
+
+                            <!-- Price -->
+                            <div class="mb-3">
+                                {% if product.is_flash_sale and product.original_price %}
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg font-bold text-red-600">{{ product.price|floatformat:0 }}₫</span>
+                                    <span class="text-sm text-gray-400 line-through">{{ product.original_price|floatformat:0 }}₫</span>
+                                </div>
+                                {% else %}
+                                <span class="text-lg font-bold text-red-600">{{ product.price|floatformat:0 }}₫</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Promotion Text -->
+                            {% if product.promotion_text %}
+                            <p class="text-xs text-green-600 mb-3">
+                                <i class="fas fa-check-circle"></i> {{ product.promotion_text|truncatewords:5 }}
+                            </p>
+                            {% endif %}
+
+                            <!-- Rating & Wishlist -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <div class="flex text-yellow-400 text-xs">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= product.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-xs text-gray-600">({{ product.reviews_count }})</span>
+                                </div>
+                                <button onclick="toggleWishlist(event, {{ product.id }})" class="text-gray-400 hover:text-red-600 transition">
+                                    <i class="far fa-heart text-lg"></i>
+                                </button>
+                            </div>
+
+                            <!-- Quick Add Button -->
+                            <form method="post" action="{% url 'store:add_to_cart' product.id %}" class="mt-3">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="w-full bg-red-600 text-white py-2 rounded text-sm font-semibold hover:bg-red-700 transition">
+                                    <i class="fas fa-shopping-cart mr-1"></i> Thêm giỏ
+                                </button>
+                            </form>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bg-white rounded-lg p-12 text-center">
+                    <i class="fas fa-box-open text-gray-300 text-6xl mb-4"></i>
+                    <p class="text-gray-500 text-lg font-semibold">Không tìm thấy sản phẩm nào</p>
+                    <p class="text-gray-400 mt-2">Thử thay đổi tiêu chí tìm kiếm</p>
+                </div>
+                {% endif %}
+
+                <!-- Pagination -->
+                {% if products.has_other_pages %}
+                <div class="mt-8 flex justify-center items-center gap-2">
                     {% if products.has_previous %}
-                    <a href="?page={{ products.previous_page_number }}" class="px-4 py-2 border rounded hover:bg-gray-100">Trước</a>
+                    <a href="?page=1" class="px-3 py-2 border rounded hover:bg-red-50">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
                     {% endif %}
                     
                     {% for num in products.paginator.page_range %}
-                    <a href="?page={{ num }}" class="px-4 py-2 border rounded {% if products.number == num %}bg-red-600 text-white{% else %}hover:bg-gray-100{% endif %}">
-                        {{ num }}
-                    </a>
+                        {% if products.number == num %}
+                        <span class="px-3 py-2 bg-red-600 text-white rounded font-semibold">{{ num }}</span>
+                        {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                        <a href="?page={{ num }}" class="px-3 py-2 border rounded hover:bg-gray-100">{{ num }}</a>
+                        {% endif %}
                     {% endfor %}
                     
                     {% if products.has_next %}
-                    <a href="?page={{ products.next_page_number }}" class="px-4 py-2 border rounded hover:bg-gray-100">Sau</a>
+                    <a href="?page={{ products.paginator.num_pages }}" class="px-3 py-2 border rounded hover:bg-red-50">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
                     {% endif %}
-                </nav>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+function toggleWishlist(event, productId) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    fetch(`{% url 'store:toggle_wishlist' 0 %}`.replace('0', productId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const icon = event.target.closest('i');
+            if (data.in_wishlist) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-red-600');
+            } else {
+                icon.classList.remove('fas', 'text-red-600');
+                icon.classList.add('far');
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
         </div>
     </div>
 </div>
