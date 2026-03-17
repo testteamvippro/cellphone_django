@@ -13,10 +13,8 @@ class Command(BaseCommand):
         categories_data = [
             {'name': 'Điện thoại', 'slug': 'phones', 'icon': '📱'},
             {'name': 'Laptop', 'slug': 'laptops', 'icon': '💻'},
-            {'name': 'Đồng hồ', 'slug': 'watches', 'icon': '⌚'},
             {'name': 'Âm thanh', 'slug': 'audio', 'icon': '🎧'},
             {'name': 'TV', 'slug': 'tv', 'icon': '📺'},
-            {'name': 'Phụ kiện', 'slug': 'accessories', 'icon': '🔌'},
         ]
         
         for cat_data in categories_data:
