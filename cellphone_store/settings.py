@@ -153,7 +153,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_DIR = BASE_DIR / 'static'
 MEDIA_DIR = BASE_DIR / 'media'
 
-# Include both static and media directories for WhiteNoise
+# Include static directory for WhiteNoise
 STATICFILES_DIRS = []
 if STATIC_DIR.exists():
     STATICFILES_DIRS.append(str(STATIC_DIR))
@@ -163,12 +163,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # In production on Render, copy media files to staticfiles/media
-# and serve from there with WhiteNoise
+# and serve from there
 if not DEBUG:
     MEDIA_ROOT = BASE_DIR / 'staticfiles' / 'media'
-    # Ensure media is included in static files for WhiteNoise
-    if str(MEDIA_ROOT) not in STATICFILES_DIRS:
-        STATICFILES_DIRS.append(str(MEDIA_ROOT))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
