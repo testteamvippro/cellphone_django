@@ -3,7 +3,7 @@ services:
     name: cellphone-django
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py load_sample_data && python manage.py assign_random_images && mkdir -p staticfiles/media && python manage.py collectstatic --noinput && cp -r media/* staticfiles/media/ 2>/dev/null || true
+    buildCommand: pip install -r requirements.txt && mkdir -p staticfiles/media && python manage.py migrate && python manage.py load_sample_data && python manage.py assign_random_images && python manage.py collectstatic --noinput --ignore=media && chmod -R 755 staticfiles/media 2>/dev/null || true
     startCommand: gunicorn cellphone_store.wsgi
     envVars:
       - key: DEBUG
